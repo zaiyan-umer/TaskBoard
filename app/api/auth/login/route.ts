@@ -42,7 +42,7 @@ export async function POST(request: NextRequest){
             }, { status: 403 })
         }
 
-        const token = await jwt.sign({userId: existingUser._id}, process.env.JWT_SECRET!, {expiresIn: '1d'});
+        const token = jwt.sign({userId: existingUser._id}, process.env.JWT_SECRET!, {expiresIn: '1d'});
 
         const response = NextResponse.json({ message: "Login successful" }, { status: 200 })
 

@@ -1,10 +1,10 @@
 import { connectToDB } from "@/app/lib/db";
-import Task from "@/app/models/task";
+import Task, { TaskInterface } from "@/app/models/task";
 import User from "@/app/models/user";
 import mongoose from "mongoose";
 import { NextResponse, NextRequest } from "next/server";
-import { cookies } from "next/headers";
-import jwt from 'jsonwebtoken'
+import { canDeleteTask, canUpdateTask, canViewTask } from "@/app/controllers/permissions";
+import { getUserIdByCookies } from "@/app/controllers/helpers";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -20,17 +20,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("token")?.value;
-        
-        if (!token) {
+        const userId = await getUserIdByCookies();
+        if(!userId){
             return NextResponse.json({
                 message: "Unauthorized"
             }, { status: 401 })
         }
-        
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
-        const userId = decoded.userId;
 
         await connectToDB();
         const user = await User.findOne({_id: userId});
@@ -48,12 +43,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             }, { status: 404 })
         }
 
-        if(user.role === 'user'){
-            if(task.assignedTo.toString() !== user._id.toString() && task.createdBy.toString() !== user._id.toString()){
-                return NextResponse.json({
-                    message: "Unauthorized to view this task"
-                }, { status: 403 })
-            }
+        if(!canViewTask(user, task)){
+            return NextResponse.json({
+                message: "Unauthorized to view this task"
+            }, { status: 403 })
         }
 
         return NextResponse.json({
@@ -84,17 +77,12 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("token")?.value;
-        
-        if (!token) {
+        const userId = await getUserIdByCookies();
+        if(!userId){
             return NextResponse.json({
                 message: "Unauthorized"
             }, { status: 401 })
         }
-        
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
-        const userId = decoded.userId;
 
         await connectToDB();
         const user = await User.findOne({_id: userId});
@@ -112,7 +100,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
             }, { status: 404 })
         }
 
-        if(user.role === 'user'){
+        if(!canDeleteTask(user, task)){
             return NextResponse.json({
                     message: "Unauthorized to delete this task"
                 }, { status: 403 })
@@ -132,7 +120,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 }
 
-export async function PUT(request : NextRequest, {params} : {params: Promise<{id: string}>}){
+export async function PATCH(request : NextRequest, {params} : {params: Promise<{id: string}>}){
     const {title, description, status, priority, dueDate, assignedTo} = await request.json();
 
     const trimmedTitle = title?.trim();
@@ -172,17 +160,12 @@ export async function PUT(request : NextRequest, {params} : {params: Promise<{id
         }, { status: 400 })
     }
     try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("token")?.value;
-        
-        if (!token) {
+        const userId = await getUserIdByCookies();
+        if(!userId){
             return NextResponse.json({
                 message: "Unauthorized"
             }, { status: 401 })
         }
-        
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
-        const userId = decoded.userId;
 
         await connectToDB();
         const user = await User.findOne({_id: userId});
@@ -201,16 +184,9 @@ export async function PUT(request : NextRequest, {params} : {params: Promise<{id
         }
 
         // Authorization
-        const isCreator = task.createdBy.toString() === user._id.toString();
-        const isAssignee = task.assignedTo.toString() === user._id.toString();
-        if(user.role === 'user' && !isCreator && !isAssignee){
+        if(!canUpdateTask(user, task)){
             return NextResponse.json({
                 message: "Unauthorized to update this task"
-            }, { status: 403 })
-        }
-        if(user.role === 'user' && assignedTo && assignedTo !== task.assignedTo.toString()){
-            return NextResponse.json({
-                message: "Unauthorized to reassign this task"
             }, { status: 403 })
         }
 
@@ -226,7 +202,7 @@ export async function PUT(request : NextRequest, {params} : {params: Promise<{id
         }
 
         // Update task
-        const updateData: any = {};
+        const updateData: Partial<TaskInterface> = {};
         if(trimmedTitle !== undefined) updateData.title = trimmedTitle;
         if(trimmedDescription !== undefined) updateData.description = trimmedDescription;
         if(status !== undefined) updateData.status = status;

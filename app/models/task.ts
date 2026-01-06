@@ -1,6 +1,6 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-interface TaskInterface{
+export interface TaskInterface{
     title: string,
     description: string,
     status: 'todo' | 'in-progress' | 'done',

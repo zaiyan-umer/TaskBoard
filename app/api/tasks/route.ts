@@ -2,8 +2,7 @@ import { connectToDB } from "@/app/lib/db";
 import Task from "@/app/models/task";
 import User from "@/app/models/user";
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from 'jsonwebtoken';
+import { getUserIdByCookies } from "@/app/controllers/helpers";
 
 export async function POST(request: NextRequest){
     const {title, description, priority, dueDate, assignedTo = ''} = await request.json();
@@ -29,18 +28,13 @@ export async function POST(request: NextRequest){
         }, {status : 400})
     }
 
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    if(!token){
-        return NextResponse.json({
-            message: "Unauthorized"
-        }, { status: 401 })
-    }
-
     try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
-        const userId = decoded.userId;
+        const userId = await getUserIdByCookies();
+        if(!userId){
+            return NextResponse.json({
+                message: "Unauthorized"
+            }, { status: 401 })
+        }
         
         await connectToDB();
         const user = await User.findById(userId);
@@ -86,18 +80,13 @@ export async function POST(request: NextRequest){
 }
 
 export async function GET(){
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    if(!token){
-        return NextResponse.json({
-            message: "Unauthorized"
-        }, { status: 401 })
-    }
-
     try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
-        const userId = decoded.userId;
+        const userId = await getUserIdByCookies();
+        if(!userId){
+            return NextResponse.json({
+                message: "Unauthorized"
+            }, { status: 401 })
+        }
 
         await connectToDB();
         const tasks = await Task.find({ $or: [{ createdBy: userId }, { assignedTo: userId }] });
