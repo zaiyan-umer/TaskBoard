@@ -2,7 +2,7 @@ import mongoose, { model, models, Schema } from "mongoose";
 import bcrypt from 'bcrypt'
 
 interface IUser {
-    name: string,
+    username: string,
     email: string,
     password: string,
     role: "admin" | "user",
@@ -12,7 +12,7 @@ interface IUser {
 }
 
 const UserSchema = new Schema<IUser>({
-    name: {
+    username: {
         type: String,
         required: true
     },
