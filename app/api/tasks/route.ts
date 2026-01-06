@@ -1,0 +1,113 @@
+import { connectToDB } from "@/app/lib/db";
+import Task from "@/app/models/task";
+import User from "@/app/models/user";
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import jwt from 'jsonwebtoken';
+
+export async function POST(request: NextRequest){
+    const {title, description, priority, dueDate, assignedTo = ''} = await request.json();
+    
+    const trimmedTitle = title?.trim();
+    const trimmedDescription = description?.trim();
+    
+    if(!trimmedTitle || !trimmedDescription){
+        return NextResponse.json({
+            message: "Incomplete information"
+        }, {status : 400})
+    }
+    
+    if(priority && !['high', 'medium', 'low'].includes(priority)){
+        return NextResponse.json({
+            message: "Invalid priority value"
+        }, {status : 400})
+    }
+    
+    if(dueDate && typeof dueDate !== 'string'){
+        return NextResponse.json({
+            message: "Invalid due date format"
+        }, {status : 400})
+    }
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if(!token){
+        return NextResponse.json({
+            message: "Unauthorized"
+        }, { status: 401 })
+    }
+
+    try{
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        const userId = decoded.userId;
+        
+        await connectToDB();
+        const user = await User.findById(userId);
+        
+        if(!user){
+            return NextResponse.json({
+                message: "User not found"
+            }, { status: 404 })
+        }
+        
+        if(user.role === 'user' && assignedTo && assignedTo !== userId){
+            return NextResponse.json({
+                message: "Unauthorized to assign task"
+            }, { status: 403 }) 
+        }
+
+        let assignedUserId = user._id;
+        if(assignedTo){
+            const assignedUser = await User.findById(assignedTo);
+            if(!assignedUser){
+                return NextResponse.json({
+                    message: "Assigned user not found"
+                }, { status: 400 })
+            }
+            assignedUserId = assignedUser._id;
+        }
+
+        const task = await Task.create({
+            title: trimmedTitle, description: trimmedDescription, priority, dueDate, createdBy: user._id, assignedTo: assignedUserId
+        })
+
+        return NextResponse.json({
+            message: "Task created successfully",
+            task: task
+        }, {status: 201})
+
+    }catch(error){
+        console.error("Error while creating task: ", error);
+        return NextResponse.json({
+            message: "Error while creating task"
+        }, { status: 500 })
+    }
+}
+
+export async function GET(){
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if(!token){
+        return NextResponse.json({
+            message: "Unauthorized"
+        }, { status: 401 })
+    }
+
+    try{
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+        const userId = decoded.userId;
+
+        await connectToDB();
+        const tasks = await Task.find({ $or: [{ createdBy: userId }, { assignedTo: userId }] });
+
+        return NextResponse.json({ tasks }, { status: 200 })
+    }
+    catch(error){
+        console.error("Error while fetching tasks: ", error);
+        return NextResponse.json({
+            message: "Error while fetching tasks"
+        }, {status: 500})
+    }
+}

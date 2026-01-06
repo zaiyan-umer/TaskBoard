@@ -6,7 +6,8 @@ interface TaskInterface{
     status: 'todo' | 'in-progress' | 'done',
     priority: 'high' | 'low' | 'medium',
     dueDate: string,
-    owner: mongoose.Types.ObjectId,
+    createdBy: mongoose.Types.ObjectId,
+    assignedTo: mongoose.Types.ObjectId,
     createdAt? : Date,
     updatedAt? : Date,
     _id? : mongoose.Types.ObjectId
@@ -34,7 +35,12 @@ const TaskSchema = new Schema<TaskInterface>({
         type: String,
         default: 'no due date'
     },
-    owner: {
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    assignedTo: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
