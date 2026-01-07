@@ -21,10 +21,8 @@ export async function GET() {
             }, { status: 404 })
         }
 
-        if (user.role === 'user') {
-            return NextResponse.json({
-                message: "Unauthorized"
-            }, { status: 401 })
+        if (user.role !== 'admin') {
+        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
         const users = await User.find({}, "username email");

@@ -34,10 +34,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             }, { status: 404 })
         }
 
-        if (currUser.role === 'user') {
-            return NextResponse.json({
-                message: "Unauthorized"
-            }, { status: 401 })
+        if (currUser.role !== 'admin') {
+        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
         const user = await User.findById(id).select("-password");
