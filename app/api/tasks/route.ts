@@ -4,57 +4,57 @@ import User from "@/app/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import { getUserIdByCookies } from "@/app/controllers/helpers";
 
-export async function POST(request: NextRequest){
-    const {title, description, priority, dueDate, assignedTo = ''} = await request.json();
-    
+export async function POST(request: NextRequest) {
+    const { title, description, priority, dueDate, assignedTo = '' } = await request.json();
+
     const trimmedTitle = title?.trim();
     const trimmedDescription = description?.trim();
-    
-    if(!trimmedTitle || !trimmedDescription){
+
+    if (!trimmedTitle || !trimmedDescription) {
         return NextResponse.json({
             message: "Incomplete information"
-        }, {status : 400})
-    }
-    
-    if(priority && !['high', 'medium', 'low'].includes(priority)){
-        return NextResponse.json({
-            message: "Invalid priority value"
-        }, {status : 400})
-    }
-    
-    if(dueDate && typeof dueDate !== 'string'){
-        return NextResponse.json({
-            message: "Invalid due date format"
-        }, {status : 400})
+        }, { status: 400 })
     }
 
-    try{
+    if (priority && !['high', 'medium', 'low'].includes(priority)) {
+        return NextResponse.json({
+            message: "Invalid priority value"
+        }, { status: 400 })
+    }
+
+    if (dueDate && typeof dueDate !== 'string') {
+        return NextResponse.json({
+            message: "Invalid due date format"
+        }, { status: 400 })
+    }
+
+    try {
         const userId = await getUserIdByCookies();
-        if(!userId){
+        if (!userId) {
             return NextResponse.json({
                 message: "Unauthorized"
             }, { status: 401 })
         }
-        
+
         await connectToDB();
         const user = await User.findById(userId);
-        
-        if(!user){
+
+        if (!user) {
             return NextResponse.json({
                 message: "User not found"
             }, { status: 404 })
         }
-        
-        if(user.role === 'user' && assignedTo && assignedTo !== userId){
+
+        if (user.role === 'user' && assignedTo && assignedTo !== userId) {
             return NextResponse.json({
                 message: "Unauthorized to assign task"
-            }, { status: 403 }) 
+            }, { status: 403 })
         }
 
         let assignedUserId = user._id;
-        if(assignedTo){
+        if (assignedTo) {
             const assignedUser = await User.findById(assignedTo);
-            if(!assignedUser){
+            if (!assignedUser) {
                 return NextResponse.json({
                     message: "Assigned user not found"
                 }, { status: 400 })
@@ -69,9 +69,9 @@ export async function POST(request: NextRequest){
         return NextResponse.json({
             message: "Task created successfully",
             task: task
-        }, {status: 201})
+        }, { status: 201 })
 
-    }catch(error){
+    } catch (error) {
         console.error("Error while creating task: ", error);
         return NextResponse.json({
             message: "Error while creating task"
@@ -79,24 +79,67 @@ export async function POST(request: NextRequest){
     }
 }
 
-export async function GET(){
-    try{
-        const userId = await getUserIdByCookies();
-        if(!userId){
-            return NextResponse.json({
-                message: "Unauthorized"
-            }, { status: 401 })
+export async function GET(request: NextRequest) {
+    try {
+        const { searchParams } = new URL(request.url)
+
+        const status = searchParams.get("status")
+        const priority = searchParams.get("priority")
+        const assignedTo = searchParams.get("assignedTo")
+        const search = searchParams.get("search")
+        const sortBy = searchParams.get("sortBy") || "createdAt"
+        const order = searchParams.get("order") === "asc" ? 1 : -1
+        const page = Number(searchParams.get("page")) || 1
+        const limit = Number(searchParams.get("limit")) || 20
+        const skip = (page - 1) * limit
+
+        const userId = await getUserIdByCookies()
+        if (!userId) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
         }
 
-        await connectToDB();
-        const tasks = await Task.find({ $or: [{ createdBy: userId }, { assignedTo: userId }] });
+        const andConditions: any[] = []
+
+        // access control (always)
+        andConditions.push({
+            $or: [{ createdBy: userId }, { assignedTo: userId }]
+        })
+
+        // search
+        if (search) {
+            andConditions.push({
+                $or: [
+                    { title: { $regex: search, $options: "i" } },
+                    { description: { $regex: search, $options: "i" } }
+                ]
+            })
+        }
+
+        // exact filters
+        if (status) andConditions.push({ status })
+        if (priority) andConditions.push({ priority })
+        if (assignedTo) andConditions.push({ assignedTo })
+
+        const filter =
+            andConditions.length > 0 ? { $and: andConditions } : {}
+
+        // sorting
+        const sort: any = {}
+        sort[sortBy] = order
+
+        await connectToDB()
+
+        const tasks = await Task.find(filter)
+            .sort(sort)
+            .skip(skip)
+            .limit(limit)
 
         return NextResponse.json({ tasks }, { status: 200 })
-    }
-    catch(error){
-        console.error("Error while fetching tasks: ", error);
-        return NextResponse.json({
-            message: "Error while fetching tasks"
-        }, {status: 500})
+    } catch (error) {
+        console.error("Error while fetching tasks:", error)
+        return NextResponse.json(
+            { message: "Error while fetching tasks" },
+            { status: 500 }
+        )
     }
 }

@@ -1,0 +1,44 @@
+import { getUserIdByCookies } from "@/app/controllers/helpers"
+import { connectToDB } from "@/app/lib/db";
+import User from "@/app/models/user";
+import { NextResponse } from "next/server";
+
+
+export async function GET() {
+    try {
+        const userId = await getUserIdByCookies();
+        if (!userId) {
+            return NextResponse.json({
+                message: "Unauthorized"
+            }, { status: 401 })
+        }
+
+        await connectToDB();
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return NextResponse.json({
+                message: "User not found"
+            }, { status: 404 })
+        }
+
+        if (user.role === 'user') {
+            return NextResponse.json({
+                message: "Unauthorized"
+            }, { status: 401 })
+        }
+
+        const users = await User.find({}, "username email");
+
+        return NextResponse.json({
+            message: "Successfully returned users",
+            users
+        }, { status: 200 })
+    }
+    catch (error) {
+        console.error("Error while fetching all users: ", error);
+        return NextResponse.json({
+            message: "Error while fetching all users"
+        }, { status: 400 })
+    }
+
+}
