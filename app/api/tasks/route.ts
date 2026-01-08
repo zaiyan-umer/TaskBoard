@@ -91,6 +91,7 @@ export async function GET(request: NextRequest) {
         const priority = searchParams.get("priority")
         const assignedTo = searchParams.get("assignedTo")
         const search = searchParams.get("search")
+        const due = searchParams.get("due");
         const sortBy = searchParams.get("sortBy") || "createdAt"
         const order = searchParams.get("order") === "asc" ? 1 : -1
         const page = Number(searchParams.get("page")) || 1
@@ -102,12 +103,38 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
         }
 
-        const andConditions: any[] = []
 
-        // access control (always)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
+
+        const endOfWeek = new Date(today);
+        endOfWeek.setDate(today.getDate() + 7);
+
+        const andConditions: any[] = []
         andConditions.push({
             $or: [{ createdBy: userId }, { assignedTo: userId }]
         })
+
+        if (due === "today") {
+            andConditions.push({
+                dueDate: { $gte: today, $lte: endOfToday }
+            });
+        }
+
+        if (due === "week") {
+            andConditions.push({
+                dueDate: { $gt: endOfToday, $lte: endOfWeek }
+            });
+        }
+
+        if (due === "overdue") {
+            andConditions.push({
+                dueDate: { $lt: today }
+            });
+        }
 
         // search
         if (search) {

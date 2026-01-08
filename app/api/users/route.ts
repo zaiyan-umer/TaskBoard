@@ -35,8 +35,8 @@ export async function GET() {
     catch (error) {
         console.error("Error while fetching all users: ", error);
         return NextResponse.json({
-            message: "Error while fetching all users"
-        }, { status: 400 })
+            message: "Internal Server Error"
+        }, { status: 500 })
     }
 
 }
