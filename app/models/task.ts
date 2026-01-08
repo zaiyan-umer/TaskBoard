@@ -5,7 +5,7 @@ export interface TaskInterface{
     description: string,
     status: 'todo' | 'in-progress' | 'done',
     priority: 'high' | 'low' | 'medium',
-    dueDate: string,
+    dueDate?: Date,
     createdBy: mongoose.Types.ObjectId,
     assignedTo: mongoose.Types.ObjectId,
     createdAt? : Date,
@@ -32,8 +32,7 @@ const TaskSchema = new Schema<TaskInterface>({
         default: 'low'
     },
     dueDate: {
-        type: String,
-        default: 'no due date'
+        type: Date
     },
     createdBy: {
         type: Schema.Types.ObjectId,

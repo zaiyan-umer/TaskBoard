@@ -22,12 +22,16 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
     }
 
-    if (dueDate && typeof dueDate !== 'string') {
-        return NextResponse.json({
-            message: "Invalid due date format"
-        }, { status: 400 })
+    let parsedDueDate = undefined;
+    // When creating/updating tasks
+    if (dueDate) {
+        parsedDueDate = new Date(dueDate);
+        if (isNaN(parsedDueDate.getTime())) {
+            return NextResponse.json({
+                message: "Invalid date format"
+            }, { status: 400 })
+        }
     }
-
     try {
         const userId = await getUserIdByCookies();
         if (!userId) {
@@ -63,7 +67,7 @@ export async function POST(request: NextRequest) {
         }
 
         const task = await Task.create({
-            title: trimmedTitle, description: trimmedDescription, priority, dueDate, createdBy: user._id, assignedTo: assignedUserId
+            title: trimmedTitle, description: trimmedDescription, priority, dueDate: parsedDueDate, createdBy: user._id, assignedTo: assignedUserId
         })
 
         return NextResponse.json({

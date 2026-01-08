@@ -141,10 +141,14 @@ export async function PATCH(request : NextRequest, {params} : {params: Promise<{
             message: "Invalid priority value"
         }, { status: 400 })
     }
-    if(dueDate && typeof dueDate !== 'string'){
-        return NextResponse.json({
-            message: "Invalid due date format"
-        }, { status: 400 })
+    let parsedDueDate = undefined;
+    if (dueDate) {
+        parsedDueDate = new Date(dueDate);
+        if (isNaN(parsedDueDate.getTime())) {
+            return NextResponse.json({
+                message: "Invalid date format"
+            }, { status: 400 })
+        }
     }
 
     const {id} = await params;
@@ -207,7 +211,7 @@ export async function PATCH(request : NextRequest, {params} : {params: Promise<{
         if(trimmedDescription !== undefined) updateData.description = trimmedDescription;
         if(status !== undefined) updateData.status = status;
         if(priority !== undefined) updateData.priority = priority;
-        if(dueDate !== undefined) updateData.dueDate = dueDate;
+        if(dueDate !== undefined) updateData.dueDate = parsedDueDate;
         if(assignedUserId !== task.assignedTo) updateData.assignedTo = assignedUserId;
 
         const updatedTask = await Task.findByIdAndUpdate(id, updateData, { new: true });
