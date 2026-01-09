@@ -13,7 +13,7 @@ export interface TaskInterface{
     _id? : mongoose.Types.ObjectId
 }
 
-const TaskSchema = new Schema<TaskInterface>({
+const TaskSchema = new Schema({
     title: {
         type: String,
         required: true
@@ -36,16 +36,16 @@ const TaskSchema = new Schema<TaskInterface>({
     },
     createdBy: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
         required: true
     },
     assignedTo: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
         required: true
     }
-}, {timestamps: true})
+}, { timestamps: true })
 
-const Task = models?.task || model("task", TaskSchema);
+const Task = models?.Task || model("Task", TaskSchema);
 
 export default Task;

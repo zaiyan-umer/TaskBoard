@@ -164,6 +164,9 @@ export async function GET(request: NextRequest) {
             .sort(sort)
             .skip(skip)
             .limit(limit)
+            .populate("createdBy", "username")
+            .populate("assignedTo", "username")
+            .lean()
 
         return NextResponse.json({ tasks }, { status: 200 })
     } catch (error) {

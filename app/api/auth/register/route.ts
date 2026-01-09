@@ -3,11 +3,11 @@ import User from "@/app/models/user";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest){
-    const {email, username, password, role, secret=''} = await request.json();
+    const {email, username, password} = await request.json();
     const trimmedEmail = email?.trim().toLowerCase();
     const trimmedUsername = username?.trim();
     
-    if(!trimmedEmail || !trimmedUsername || !password || !role){
+    if(!trimmedEmail || !trimmedUsername || !password){
         return NextResponse.json({
             message: "Insufficient information provided"
         }, { status: 400 })
@@ -17,19 +17,7 @@ export async function POST(request: NextRequest){
             message: "Password must be at least 6 characters long"
         }, { status: 400 })
     }
-    if(role !== 'user' && role !== 'admin'){
-        return NextResponse.json({
-            message: "Invalid role specified"
-        }, { status: 400 })
-    }
     try{
-        if(role == 'admin'){
-            if(secret != process.env.adminSecret){
-                return NextResponse.json({
-                    message: "Not authorized"
-                }, {status: 403})
-            }
-        }
         await connectToDB();
         const existingUser = await User.findOne({email: trimmedEmail});
         if(existingUser){
@@ -39,7 +27,7 @@ export async function POST(request: NextRequest){
         }
 
         const user = await User.create({
-            username: trimmedUsername, email: trimmedEmail, password, role
+            username: trimmedUsername, email: trimmedEmail, role: "user"
         })
 
         return NextResponse.json({
@@ -50,7 +38,7 @@ export async function POST(request: NextRequest){
         console.log("Error while registration: ", err);
         
         return NextResponse.json({
-            message: "Error during registration"
+            message: "Internal Server Error"
         }, { status: 500 })
     }
 }

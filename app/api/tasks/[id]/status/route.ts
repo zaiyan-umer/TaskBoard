@@ -9,7 +9,7 @@ import { NextResponse, NextRequest } from "next/server";
 export async function PATCH(request : NextRequest, {params} : {params: Promise<{id: string}>}){
     const {status} = await request.json();
 
-    if(status && !['todo', 'in-progress', 'done'].includes(status)){
+    if(status && !['todo', 'in_progress', 'done'].includes(status)){
         return NextResponse.json({
             message: "Invalid status value"
         }, { status: 400 })

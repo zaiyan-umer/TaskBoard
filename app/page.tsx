@@ -1,9 +1,72 @@
-import React from 'react'
+'use client'
 
-const page = () => {
+import React, { useEffect, useCallback, useState } from 'react'
+import CardComponent from '@/components/CardComponent'
+import { SheetComponent } from '@/components/SheetComponent';
+import { api } from '@/lib/axios';
+import { TaskInterface } from './models/task';
+
+const Page = () => {
+  const [taskStatus, setTaskStatus] = useState();
+  const [tasks, setTasks] = useState<TaskInterface[]>([])
+
+  const fetchTasks = useCallback(async () => {
+    try {
+      const res = await api.get('/tasks', {
+        params: { status: taskStatus }
+      })
+      setTasks(res.data?.tasks ?? [])
+    } catch (err) {
+      console.error("Error fetching tasks:", err)
+    }
+  }, [taskStatus])
+
+  useEffect(() => {
+    fetchTasks()
+  }, [fetchTasks])
+
+  useEffect(() => {
+    const handler = () => fetchTasks()
+
+    window.addEventListener('task:created', handler)
+    window.addEventListener('task:updated', handler)
+    window.addEventListener('task:deleted', handler)
+
+    return () => {
+      window.removeEventListener('task:created', handler)
+      window.removeEventListener('task:updated', handler)
+      window.removeEventListener('task:deleted', handler)
+    }
+  }, [fetchTasks])
+
+
+  const getPriorityAccentColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return { bg: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-200 dark:border-red-800', icon: 'text-red-600 dark:text-red-400', text: 'text-red-600 dark:text-red-400', badge: 'bg-red-100 text-red-700 border-red-300' };
+      case 'medium': return { bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-200 dark:border-amber-800', icon: 'text-amber-600 dark:text-amber-400', text: 'text-amber-600 dark:text-amber-400', badge: 'bg-amber-100 text-amber-700 border-amber-300' };
+      case 'low': return { bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-800', icon: 'text-emerald-600 dark:text-emerald-400', text: 'text-emerald-600 dark:text-emerald-400', badge: 'bg-emerald-100 text-emerald-700 border-emerald-300' };
+      default: return { bg: 'bg-gray-50 dark:bg-gray-900/20', border: 'border-gray-200 dark:border-gray-800', icon: 'text-gray-600 dark:text-gray-400', text: 'text-gray-600 dark:text-gray-400', badge: 'bg-gray-100 text-gray-700 border-gray-300' };
+    }
+  };
+
   return (
-    <div>page</div>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 pt-16">
+      <SheetComponent />
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mt-4">
+        {tasks.map((task) => {
+          const colors = getPriorityAccentColor(task.priority);
+          return (
+            <CardComponent
+              task={task}
+              key={task._id}
+              setTaskStatus={setTaskStatus}
+              colors={colors}
+            />
+          );
+        })}
+      </div>
+    </div>
   )
 }
 
-export default page
+export default Page
