@@ -4,38 +4,17 @@ import { Menu, LogOut, User, Settings } from "lucide-react"
 import { Dialog } from "./ui/dialog"
 import DialogComponent from "./DialogComponent"
 import { Separator } from "@/components/ui/separator"
-import { api } from "@/lib/axios"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { AxiosError } from "axios"
+import { useGetRole } from "@/app/hooks/useGetRole"
+import { useLogout } from "@/app/hooks/useAuth"
 
 export function SheetComponent() {
-    const [role, setUserRole] = useState("user")
-    const router = useRouter()
-
-    const getRole = async () => {
-       const res = await api.get('/users/role');
-       setUserRole(res.data.role);
-    }
-
-    useEffect(() => {
-        getRole();
-    }, [])
+    const { role, loading } = useGetRole();
+    const { logout } = useLogout();
 
     const logoutHandler = async () => {
-        try {
-            const res = await api.get("/auth/logout");
-            if (res.status === 200) {
-                toast.success("Logged out successfully!");
-                router.push("/auth/login");
-            }
-        } catch (err) {
-            const error = err as AxiosError<{message: string}>
-            const errorMessage = error.response?.data?.message || "Failed to logout. Please try again.";
-            toast.error(errorMessage);
-        }
+        await logout();
     }
+    
     return (
         <Sheet>
             <Dialog>
@@ -51,7 +30,7 @@ export function SheetComponent() {
                     </SheetHeader>
                     <div className="grid flex-1 auto-rows-min gap-4 py-4">
                         {/* Create Task Button */}
-                        <DialogComponent role={role}/>
+                        <DialogComponent role={role ?? undefined} />
 
                         <Separator />
 

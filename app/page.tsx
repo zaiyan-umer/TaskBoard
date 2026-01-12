@@ -1,41 +1,10 @@
 'use client'
-
-import { useEffect, useCallback, useState } from 'react'
 import CardComponent from '@/components/CardComponent'
 import { SheetComponent } from '@/components/SheetComponent';
-import { api } from '@/lib/axios';
-import { PopulatedTask } from './models/task';
+import { useFetchTasks } from './hooks/useFetchTasks';
 
 const Page = () => {
-  const [tasks, setTasks] = useState<PopulatedTask[]>([])
-
-  const fetchTasks = useCallback(async () => {
-    try {
-      const res = await api.get('/tasks')
-      setTasks(res.data?.tasks ?? [])
-    } catch (err) {
-      console.error("Error fetching tasks:", err)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks])
-
-  useEffect(() => {
-    const handler = () => fetchTasks()
-
-    window.addEventListener('task:created', handler)
-    window.addEventListener('task:updated', handler)
-    window.addEventListener('task:deleted', handler)
-
-    return () => {
-      window.removeEventListener('task:created', handler)
-      window.removeEventListener('task:updated', handler)
-      window.removeEventListener('task:deleted', handler)
-    }
-  }, [fetchTasks])
-
+  const {tasks, loading} = useFetchTasks();
 
   const getPriorityAccentColor = (priority: string) => {
     switch (priority) {

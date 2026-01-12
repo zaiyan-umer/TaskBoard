@@ -1,9 +1,11 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
+export type TaskStatus = "todo" | "in_progress" | "done";
+
 export interface TaskInterface {
     title: string,
     description: string,
-    status: 'todo' | 'in-progress' | 'done',
+    status: TaskStatus,
     priority: 'high' | 'low' | 'medium',
     dueDate?: Date,
     createdBy: mongoose.Types.ObjectId,

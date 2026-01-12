@@ -1,76 +1,32 @@
 'use client'
-import {
-    Card,
-    CardDescription,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import { Badge } from '@/components/ui/badge'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Trash, User } from 'lucide-react'
-import { toast } from "sonner"
-import { useState } from "react"
-import { api } from "@/lib/axios"
-import { Button } from "./ui/button"
-import { updateTaskStatus } from "@/lib/fetch-data"
-import { PopulatedTask } from "@/app/models/task"
-import { AxiosError } from "axios"
+import { Card, CardDescription, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Trash, User } from 'lucide-react';
+import { toast } from "sonner"; 
+import { Button } from "./ui/button"; 
+import { PopulatedTask, TaskStatus } from "@/app/models/task"; 
+import { useDeleteTask } from "@/app/hooks/useDeleteTask";
+import { useUpdateTaskStatus } from "@/app/hooks/useUpdateTaskStatus";
 
 type Color = {
     bg: string; border: string; icon: string; text: string; badge: string
 }
 
 const CardComponent = ({ task, colors }: {task: PopulatedTask, colors: Color}) => {
-
-    const [status, setStatus] = useState<"in-progress" | "todo" | "done">(task.status)
-    const [isUpdating, setIsUpdating] = useState(false)
+    const {deleteTask} = useDeleteTask();
+    const {status, updateStatus, loading} = useUpdateTaskStatus(task.status as TaskStatus);
 
     const handleDelete = async () => {
-        setIsUpdating(true)
-        try {
-            const res = await api.delete(`/tasks/${task._id}`)
-            if (res.status === 200) {
-                toast.success("Task deleted successfully!")
-                window.dispatchEvent(new CustomEvent('task:deleted'))
-            }
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Failed to delete task"
-            toast.error(errorMessage)
-            setStatus(task.status)
-        } finally {
-            setIsUpdating(false)
-        }
+        await deleteTask(task._id?.toString() as string);
     }
 
-
-    const handleStatusChange = async (newStatus: "in-progress" | "todo" | "done") => {
+    const handleStatusChange = async (newStatus: TaskStatus) => {
         if (!task._id) {
             toast.error("Invalid task")
             return
         }
-        setStatus(newStatus)
-        setIsUpdating(true)
-        try {
-            const res = await updateTaskStatus({ id: task._id.toString(), newStatus });
-            if (res.status === 200) {
-                toast.success("Task updated successfully!")
-                window.dispatchEvent(new CustomEvent('task:updated'))
-            }
-        } catch (err) {
-            const error = err as AxiosError<{message: string}>
-            const errorMessage = error.response?.data?.message || "Failed to update task"
-            toast.error(errorMessage)
-            setStatus(task.status)
-        } finally {
-            setIsUpdating(false)
-        }
+        await updateStatus(task._id?.toString(), newStatus);  
     };
 
     const formatDate = (date: string | Date | undefined) => {
@@ -99,7 +55,7 @@ const CardComponent = ({ task, colors }: {task: PopulatedTask, colors: Color}) =
                         <Badge variant="secondary" className={`${colors.badge} font-medium border text-xs sm:text-sm`}>
                             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
                         </Badge>
-                        <Select value={status} onValueChange={handleStatusChange} disabled={isUpdating}>
+                        <Select value={status} onValueChange={handleStatusChange} disabled={loading}>
                             <SelectTrigger className="w-32 sm:w-40 cursor-pointer">
                                 <SelectValue placeholder="Select status" />
                             </SelectTrigger>

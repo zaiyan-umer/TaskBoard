@@ -3,50 +3,23 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {Field,FieldDescription,FieldGroup,FieldLabel} from "@/components/ui/field"
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import Link from "next/link"
-import { api } from "@/lib/axios"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { AxiosError } from "axios"
-import { validateLoginForm } from "@/lib/input-validation"
+import { useLogin } from "@/app/hooks/useAuth"
 
-export function LoginForm({className,...props}: React.ComponentProps<"div">) {
-  const router = useRouter();
+export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string>();
-  const [loading, setLoading] = useState(false);
+  const {login, loading, error} = useLogin();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-
-    if (!validateLoginForm(email, password, setError)) return;
-
-    setLoading(true);
-
-    try {
-      const res = await api.post("/auth/login", { email, password });
-      if (res.status === 200) {
-        toast.success("Login successful!");
-        if (res.data.role === "admin") {
-          router.push("/dashboard")
-        }
-        else router.push("/");
-      }
-    } catch (err) {
-      const error = err as AxiosError<{ message: string }>
-      const errorMessage = error.response?.data?.message || "Failed to login. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    await login({email, password});
   }
 
   return (

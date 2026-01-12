@@ -3,48 +3,25 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import Link from "next/link"
-import { api } from "@/lib/axios"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { AxiosError } from "axios"
-import { validateSignupForm } from "@/lib/input-validation"
+import { useSignup } from "@/app/hooks/useAuth"
 
-export function SignupForm({className, ...props }: React.ComponentProps<"div">) {
-  const router = useRouter();
+export function SignupForm({ className, ...props }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { signup, loading, error } = useSignup();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    
-    if (!validateSignupForm(email, username, password, setError)) return;
-    
-    setLoading(true);
-    
-    try {
-      const res = await api.post("/auth/register", { email, username, password });
-      if (res.status === 201) {
-        toast.success("Signup successful!");
-        router.push("/");
-      }
-    } catch (err) {
-      const error = err as AxiosError<{message: string}>
-      const errorMessage = error.response?.data?.message || "Failed to Signup. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    const success = await signup({ email, username, password });
+    if (!success) return;
   }
 
   return (
@@ -63,7 +40,7 @@ export function SignupForm({className, ...props }: React.ComponentProps<"div">) 
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   value={email}
-                  onChange={e=>setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   onBlur={() => {
                     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                       toast.error("Please enter a valid email");
@@ -78,7 +55,7 @@ export function SignupForm({className, ...props }: React.ComponentProps<"div">) 
                 <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
                   value={username}
-                  onChange={e=>setUsername(e.target.value)}
+                  onChange={e => setUsername(e.target.value)}
                   id="username"
                   type="text"
                 />
@@ -88,13 +65,13 @@ export function SignupForm({className, ...props }: React.ComponentProps<"div">) 
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
                 <div className="relative">
-                  <Input 
-                    id="password" 
-                    value={password} 
-                    onChange={e=>setPassword(e.target.value)} 
-                    type={showPassword ? "text" : "password"} 
+                  <Input
+                    id="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                     
+
                   />
                   <button
                     type="button"
@@ -111,7 +88,7 @@ export function SignupForm({className, ...props }: React.ComponentProps<"div">) 
                   {loading ? "Registering..." : "Register"}
                 </Button>
               </Field>
- 
+
               <FieldDescription className="text-center">
                 Already have an account? <Link className="underline underline-offset-2" href={"/auth/login"}>Login</Link>
               </FieldDescription>

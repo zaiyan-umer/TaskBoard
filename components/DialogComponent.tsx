@@ -4,29 +4,25 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChevronDownIcon, Plus } from "lucide-react"
-import { useEffect, useState } from "react"
-import { api } from "@/lib/axios"
-import { toast } from "sonner"
+import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { fetchAllUsers } from "@/lib/fetch-data"
-import { IUser } from "@/app/models/user"
-import { AxiosError } from "axios"
+import { useCreateTask } from "@/app/hooks/useCreateTask"
+import { useUsers } from "@/app/hooks/useUsers"
 
 export default function DialogComponent({ role }: { role?: string }) {
     const [open, setOpen] = useState(false)
     const [datePickerOpen, setDatePickerOpen] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [date, setDate] = useState<Date | undefined>(undefined)
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         priority: "medium",
-        dueDate: date,
-        assignedTo: ""
+        assignedTo: "",
+        dueDate: undefined as Date | undefined
     })
-    const [users, setUsers] = useState<IUser[]>([])
-    const [usersLoading, setUsersLoading] = useState(false)
+
+    const { users, loading: usersLoading } = useUsers(role)
+    const { createTask, loading } = useCreateTask()
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -43,60 +39,19 @@ export default function DialogComponent({ role }: { role?: string }) {
         }))
     }
 
-    useEffect(() => {
-        if (role !== "admin") return
-        const fetchUsers = async () => {
-            try {
-                setUsersLoading(true)
-                const res = await fetchAllUsers();
-                setUsers(res ?? [])
-            } catch (err) {
-                console.error("Failed to load users", err)
-            } finally {
-                setUsersLoading(false)
-            }
-        }
-        fetchUsers()
-    }, [role])
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        const success = await createTask(formData)
+        if (!success) return
 
-        if (!formData.title.trim() || !formData.description.trim()) {
-            toast.error("Title and description are required")
-            return
-        }
-
-        setLoading(true)
-        try {
-            const res = await api.post("/tasks", {
-                title: formData.title,
-                description: formData.description,
-                priority: formData.priority,
-                dueDate: formData.dueDate ? formData.dueDate.toISOString() : null,
-                assignedTo: formData.assignedTo || undefined
-            })
-
-            if (res.status === 201) {
-                toast.success("Task created successfully!")
-                setFormData({
-                    title: "",
-                    description: "",
-                    priority: "medium",
-                    dueDate: undefined,
-                    assignedTo: ""
-                })
-                window.dispatchEvent(new CustomEvent('task:created'))
-                setOpen(false)
-            }
-        }
-        catch (err) {
-            const error = err as AxiosError<{ message: string }>
-            const errorMessage = error.response?.data?.message || "Failed to create task"
-            toast.error(errorMessage)
-        } finally {
-            setLoading(false)
-        }
+        setFormData({
+            title: "",
+            description: "",
+            priority: "medium",
+            dueDate: undefined,
+            assignedTo: ""
+        })
+        setOpen(false)
     }
 
     return (
@@ -180,7 +135,7 @@ export default function DialogComponent({ role }: { role?: string }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {users.map((u) => (
-                                        <SelectItem key={u._id?.toString()} value={u._id.toString()} className='cursor-pointer'>
+                                        <SelectItem key={u._id?.toString()} value={u._id?.toString() as string} className='cursor-pointer'>
                                             {u.username}
                                         </SelectItem>
                                     ))}
@@ -202,19 +157,20 @@ export default function DialogComponent({ role }: { role?: string }) {
                                     id="date"
                                     className="w-48 justify-between font-normal cursor-pointer"
                                 >
-                                    {date ? date.toLocaleDateString() : "Select date"}
+                                    {formData.dueDate ? formData.dueDate.toLocaleDateString() : "Select date"}
                                     <ChevronDownIcon />
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                                 <Calendar
                                     mode="single"
-                                    selected={date}
+                                    selected={formData.dueDate}
                                     captionLayout="dropdown"
                                     onSelect={(date) => {
-                                        setDate(date)
+                                        setFormData(prev => ({ ...prev, dueDate: date }))
                                         setDatePickerOpen(false)
                                     }}
+
                                 />
                             </PopoverContent>
                         </Popover>

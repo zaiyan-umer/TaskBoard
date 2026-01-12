@@ -131,7 +131,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             message: "Title cannot be empty"
         }, { status: 400 })
     }
-    if (status && !['todo', 'in-progress', 'done'].includes(status)) {
+    if (status && !["todo", "in_progress", "done"].includes(status)) {
         return NextResponse.json({
             message: "Invalid status value"
         }, { status: 400 })
