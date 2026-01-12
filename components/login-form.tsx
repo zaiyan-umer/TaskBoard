@@ -3,12 +3,7 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import {Field,FieldDescription,FieldGroup,FieldLabel} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import Link from "next/link"
@@ -16,59 +11,37 @@ import { api } from "@/lib/axios"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { AxiosError } from "axios"
+import { validateLoginForm } from "@/lib/input-validation"
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function LoginForm({className,...props}: React.ComponentProps<"div">) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
-
-  const validateForm = () => {
-    if (!email.trim()) {
-      setError("Email is required");
-      toast.error("Email is required");
-      return false;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
-      toast.error("Please enter a valid email address");
-      return false;
-    }
-    if (!password.trim()) {
-      setError("Password is required");
-      toast.error("Password is required");
-      return false;
-    }
-    return true;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
-    if (!validateForm()) {
-      return;
-    }
-    
+
+    if (!validateLoginForm(email, password, setError)) return;
+
     setLoading(true);
-    
+
     try {
       const res = await api.post("/auth/login", { email, password });
       if (res.status === 200) {
         toast.success("Login successful!");
-        if(res.data.role === "admin"){
+        if (res.data.role === "admin") {
           router.push("/dashboard")
         }
         else router.push("/");
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Failed to login. Please try again.";
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>
+      const errorMessage = error.response?.data?.message || "Failed to login. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -92,7 +65,7 @@ export function LoginForm({
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   value={email}
-                  onChange={e=>setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   onBlur={() => {
                     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                       toast.error("Please enter a valid email");
@@ -109,13 +82,13 @@ export function LoginForm({
                   <Link className="ml-auto text-sm underline-offset-2 hover:underline" href={""}>Forgot your password?</Link>
                 </div>
                 <div className="relative">
-                  <Input 
-                    id="password" 
-                    value={password} 
-                    onChange={e=>setPassword(e.target.value)} 
-                    type={showPassword ? "text" : "password"} 
+                  <Input
+                    id="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                     
+
                   />
                   <button
                     type="button"
@@ -132,7 +105,7 @@ export function LoginForm({
                   {loading ? "Logging in..." : "Login"}
                 </Button>
               </Field>
- 
+
               <FieldDescription className="text-center">
                 Don&apos;t have an account? <Link className="underline underline-offset-2" href={"/auth/register"}>Signup</Link>
               </FieldDescription>

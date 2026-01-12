@@ -5,8 +5,8 @@ import User from "@/app/models/user";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
-export async function GET(){
-    try{
+export async function GET() {
+    try {
         const userId = await getUserIdByCookies();
         if (!userId) {
             return NextResponse.json({
@@ -40,29 +40,29 @@ export async function GET(){
 
         // Due today
         const dueToday = await Task.countDocuments({
-        ...baseFilter,
-        dueDate: {
-            $gte: today,
-            $lte: endOfToday,
-        },
-        status: { $ne: "done" },
+            ...baseFilter,
+            dueDate: {
+                $gte: today,
+                $lte: endOfToday,
+            },
+            status: { $ne: "done" },
         });
 
         // Due this week
         const dueThisWeek = await Task.countDocuments({
-        ...baseFilter,
-        dueDate: {
-            $gt: endOfToday,
-            $lte: endOfWeek,
-        },
-        status: { $ne: "done" },
+            ...baseFilter,
+            dueDate: {
+                $gt: endOfToday,
+                $lte: endOfWeek,
+            },
+            status: { $ne: "done" },
         });
 
         // Overdue
         const overdue = await Task.countDocuments({
-        ...baseFilter,
-        dueDate: { $lt: today },
-        status: { $ne: "done" },
+            ...baseFilter,
+            dueDate: { $lt: today },
+            status: { $ne: "done" },
         });
 
         return NextResponse.json({
@@ -71,11 +71,12 @@ export async function GET(){
         })
 
     }
-    catch(error){
+    catch (error) {
         console.error("Internal Server Error: ", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
         return NextResponse.json({
-            message: "Internal Server Error",
-            error
-        }, {status: 500})
+            message: errorMessage
+        }, { status: 500 })
     }
 }

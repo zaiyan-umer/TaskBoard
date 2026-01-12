@@ -66,8 +66,9 @@ export async function PATCH(request : NextRequest, {params} : {params: Promise<{
     }
     catch (error) {
         console.error("Error while updating Status: ", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
         return NextResponse.json({
-            message: "Error while updating Status"
+            message: errorMessage
         }, { status: 500 })
     }
 }

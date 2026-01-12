@@ -170,9 +170,11 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ tasks }, { status: 200 })
     } catch (error) {
-        console.error("Error while fetching tasks:", error)
+        console.error("Error while fetching tasks:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+        
         return NextResponse.json(
-            { message: "Error while fetching tasks" },
+            { message: errorMessage },
             { status: 500 }
         )
     }

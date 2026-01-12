@@ -3,12 +3,7 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import {Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import Link from "next/link"
@@ -16,11 +11,10 @@ import { api } from "@/lib/axios"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { AxiosError } from "axios"
+import { validateSignupForm } from "@/lib/input-validation"
 
-export function SignupForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function SignupForm({className, ...props }: React.ComponentProps<"div">) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -29,43 +23,11 @@ export function SignupForm({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const validateForm = () => {
-    if (!email.trim()) {
-      setError("Email is required");
-      toast.error("Email is required");
-      return false;
-    }
-    if (!username.trim()) {
-      setError("Username is required");
-      toast.error("Username is required");
-      return false;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
-      toast.error("Please enter a valid email address");
-      return false;
-    }
-    if (!password.trim()) {
-      setError("Password is required");
-      toast.error("Password is required");
-      return false;
-    }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      toast.error("Password must be at least 6 characters");
-      return false;
-    }
-    return true;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateSignupForm(email, username, password, setError)) return;
     
     setLoading(true);
     
@@ -75,8 +37,9 @@ export function SignupForm({
         toast.success("Signup successful!");
         router.push("/");
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Failed to Signup. Please try again.";
+    } catch (err) {
+      const error = err as AxiosError<{message: string}>
+      const errorMessage = error.response?.data?.message || "Failed to Signup. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

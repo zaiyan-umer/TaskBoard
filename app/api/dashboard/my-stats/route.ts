@@ -30,12 +30,12 @@ export async function GET(request: NextRequest) {
         };
 
         const totalTasks = await Task.countDocuments(baseFilter);
-        const highPriorityCount = await Task.countDocuments({...baseFilter, priority: "high"});
-        const mediumPriorityCount = await Task.countDocuments({...baseFilter, priority: "medium"});
-        const lowPriorityCount = await Task.countDocuments({...baseFilter, priority: "low"});
-        const todoCount = await Task.countDocuments({...baseFilter, status: "todo"});
-        const inProgressCount = await Task.countDocuments({...baseFilter,status: "in-progress"});
-        const doneCount = await Task.countDocuments({...baseFilter, status: "done"});
+        const highPriorityCount = await Task.countDocuments({ ...baseFilter, priority: "high" });
+        const mediumPriorityCount = await Task.countDocuments({ ...baseFilter, priority: "medium" });
+        const lowPriorityCount = await Task.countDocuments({ ...baseFilter, priority: "low" });
+        const todoCount = await Task.countDocuments({ ...baseFilter, status: "todo" });
+        const inProgressCount = await Task.countDocuments({ ...baseFilter, status: "in-progress" });
+        const doneCount = await Task.countDocuments({ ...baseFilter, status: "done" });
 
         return NextResponse.json({
             message: "Count returned successfully",
@@ -50,8 +50,10 @@ export async function GET(request: NextRequest) {
     }
     catch (error) {
         console.error("Internal Server Error: ", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
         return NextResponse.json({
-            message: "Internal Server Error"
+            message: errorMessage
         }, { status: 500 })
     }
 }

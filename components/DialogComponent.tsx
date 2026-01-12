@@ -1,40 +1,31 @@
 import { Button } from "@/components/ui/button"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Calendar, Plus } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ChevronDownIcon, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { api } from "@/lib/axios"
-import { format } from "date-fns"
 import { toast } from "sonner"
-
-type UserOption = { _id: string; username: string }
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { fetchAllUsers } from "@/lib/fetch-data"
+import { IUser } from "@/app/models/user"
+import { AxiosError } from "axios"
 
 export default function DialogComponent({ role }: { role?: string }) {
     const [open, setOpen] = useState(false)
+    const [datePickerOpen, setDatePickerOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [date, setDate] = useState<Date | undefined>(undefined)
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         priority: "medium",
-        dueDate: null as Date | null,
+        dueDate: date,
         assignedTo: ""
     })
-    const [users, setUsers] = useState<UserOption[]>([])
+    const [users, setUsers] = useState<IUser[]>([])
     const [usersLoading, setUsersLoading] = useState(false)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -52,21 +43,13 @@ export default function DialogComponent({ role }: { role?: string }) {
         }))
     }
 
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const date = e.target.valueAsDate
-        setFormData(prev => ({
-            ...prev,
-            dueDate: date
-        }))
-    }
-
     useEffect(() => {
         if (role !== "admin") return
         const fetchUsers = async () => {
             try {
                 setUsersLoading(true)
-                const res = await api.get("/users") // assumes baseURL '/api'
-                setUsers(res.data?.users ?? [])
+                const res = await fetchAllUsers();
+                setUsers(res ?? [])
             } catch (err) {
                 console.error("Failed to load users", err)
             } finally {
@@ -100,14 +83,16 @@ export default function DialogComponent({ role }: { role?: string }) {
                     title: "",
                     description: "",
                     priority: "medium",
-                    dueDate: null,
+                    dueDate: undefined,
                     assignedTo: ""
                 })
                 window.dispatchEvent(new CustomEvent('task:created'))
                 setOpen(false)
             }
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.message || "Failed to create task"
+        }
+        catch (err) {
+            const error = err as AxiosError<{ message: string }>
+            const errorMessage = error.response?.data?.message || "Failed to create task"
             toast.error(errorMessage)
         } finally {
             setLoading(false)
@@ -167,13 +152,13 @@ export default function DialogComponent({ role }: { role?: string }) {
                             Priority
                         </label>
                         <Select value={formData.priority} onValueChange={handlePriorityChange}>
-                            <SelectTrigger id="priority" disabled={loading}>
+                            <SelectTrigger id="priority" disabled={loading} className='cursor-pointer'>
                                 <SelectValue placeholder="Select priority" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="low">Low</SelectItem>
-                                <SelectItem value="medium">Medium</SelectItem>
-                                <SelectItem value="high">High</SelectItem>
+                                <SelectItem value="low" className='cursor-pointer'>Low</SelectItem>
+                                <SelectItem value="medium" className='cursor-pointer'>Medium</SelectItem>
+                                <SelectItem value="high" className='cursor-pointer'>High</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -190,12 +175,12 @@ export default function DialogComponent({ role }: { role?: string }) {
                                 }
                                 disabled={loading || usersLoading}
                             >
-                                <SelectTrigger id="assign">
+                                <SelectTrigger id="assign" className='cursor-pointer'>
                                     <SelectValue placeholder={usersLoading ? "Loading..." : "Select User"} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {users.map((u) => (
-                                        <SelectItem key={u._id} value={u._id}>
+                                        <SelectItem key={u._id?.toString()} value={u._id.toString()} className='cursor-pointer'>
                                             {u.username}
                                         </SelectItem>
                                     ))}
@@ -206,24 +191,33 @@ export default function DialogComponent({ role }: { role?: string }) {
 
                     {/* Due Date Input */}
                     <div className="space-y-2">
-                        <label htmlFor="dueDate" className="text-sm font-medium">
+                        <label htmlFor="dueDate" className="text-sm font-medium mr-4">
                             Due Date
                         </label>
-                        <div className="relative">
-                            <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <input
-                                type="date"
-                                id="dueDate"
-                                onChange={handleDateChange}
-                                disabled={loading}
-                                className="w-full pl-10 pr-3 py-2 border border-input rounded-md bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            />
-                        </div>
-                        {formData.dueDate && (
-                            <p className="text-xs text-gray-500">
-                                Selected: {format(formData.dueDate, "PPP")}
-                            </p>
-                        )}
+
+                        <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    id="date"
+                                    className="w-48 justify-between font-normal cursor-pointer"
+                                >
+                                    {date ? date.toLocaleDateString() : "Select date"}
+                                    <ChevronDownIcon />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    captionLayout="dropdown"
+                                    onSelect={(date) => {
+                                        setDate(date)
+                                        setDatePickerOpen(false)
+                                    }}
+                                />
+                            </PopoverContent>
+                        </Popover>
                     </div>
 
                     {/* Action Buttons */}

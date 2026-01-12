@@ -19,14 +19,20 @@ import { toast } from "sonner"
 import { useState } from "react"
 import { api } from "@/lib/axios"
 import { Button } from "./ui/button"
+import { updateTaskStatus } from "@/lib/fetch-data"
+import { PopulatedTask } from "@/app/models/task"
+import { AxiosError } from "axios"
 
-const CardComponent = (props) => {
-    const { task, colors } = props;
+type Color = {
+    bg: string; border: string; icon: string; text: string; badge: string
+}
 
-    const [status, setStatus] = useState(task.status)
+const CardComponent = ({ task, colors }: {task: PopulatedTask, colors: Color}) => {
+
+    const [status, setStatus] = useState<"in-progress" | "todo" | "done">(task.status)
     const [isUpdating, setIsUpdating] = useState(false)
 
-    const handleDelete = async() => {
+    const handleDelete = async () => {
         setIsUpdating(true)
         try {
             const res = await api.delete(`/tasks/${task._id}`)
@@ -34,8 +40,8 @@ const CardComponent = (props) => {
                 toast.success("Task deleted successfully!")
                 window.dispatchEvent(new CustomEvent('task:deleted'))
             }
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.message || "Failed to delete task"
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Failed to delete task"
             toast.error(errorMessage)
             setStatus(task.status)
         } finally {
@@ -43,17 +49,23 @@ const CardComponent = (props) => {
         }
     }
 
-    const handleStatusChange = async (newStatus: string) => {
+
+    const handleStatusChange = async (newStatus: "in-progress" | "todo" | "done") => {
+        if (!task._id) {
+            toast.error("Invalid task")
+            return
+        }
         setStatus(newStatus)
         setIsUpdating(true)
         try {
-            const res = await api.patch(`/tasks/${task._id}/status`, { status: newStatus })
+            const res = await updateTaskStatus({ id: task._id.toString(), newStatus });
             if (res.status === 200) {
                 toast.success("Task updated successfully!")
                 window.dispatchEvent(new CustomEvent('task:updated'))
             }
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.message || "Failed to update task"
+        } catch (err) {
+            const error = err as AxiosError<{message: string}>
+            const errorMessage = error.response?.data?.message || "Failed to update task"
             toast.error(errorMessage)
             setStatus(task.status)
         } finally {

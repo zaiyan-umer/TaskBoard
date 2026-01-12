@@ -1,28 +1,25 @@
 'use client'
 
-import React, { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import CardComponent from '@/components/CardComponent'
 import { SheetComponent } from '@/components/SheetComponent';
 import { api } from '@/lib/axios';
-import { TaskInterface } from './models/task';
+import { PopulatedTask } from './models/task';
 
 const Page = () => {
-  const [taskStatus, setTaskStatus] = useState();
-  const [tasks, setTasks] = useState<TaskInterface[]>([])
+  const [tasks, setTasks] = useState<PopulatedTask[]>([])
 
   const fetchTasks = useCallback(async () => {
     try {
-      const res = await api.get('/tasks', {
-        params: { status: taskStatus }
-      })
+      const res = await api.get('/tasks')
       setTasks(res.data?.tasks ?? [])
     } catch (err) {
       console.error("Error fetching tasks:", err)
     }
-  }, [taskStatus])
+  }, [])
 
   useEffect(() => {
-    fetchTasks()
+    fetchTasks();
   }, [fetchTasks])
 
   useEffect(() => {
@@ -58,8 +55,7 @@ const Page = () => {
           return (
             <CardComponent
               task={task}
-              key={task._id}
-              setTaskStatus={setTaskStatus}
+              key={task._id?.toString()}
               colors={colors}
             />
           );

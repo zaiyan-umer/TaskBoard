@@ -22,7 +22,7 @@ export async function GET() {
         }
 
         if (user.role !== 'admin') {
-        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
         const users = await User.find({}, "username email");
@@ -34,8 +34,10 @@ export async function GET() {
     }
     catch (error) {
         console.error("Error while fetching all users: ", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
         return NextResponse.json({
-            message: "Internal Server Error"
+            message: errorMessage
         }, { status: 500 })
     }
 

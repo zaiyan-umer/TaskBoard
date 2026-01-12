@@ -28,8 +28,10 @@ export async function GET() {
     }
     catch (error) {
         console.error("Error while fetching role: ", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
         return NextResponse.json({
-            message: "Internal Server Error"
+            message: errorMessage
         }, { status: 500 })
     }
 

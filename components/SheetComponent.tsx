@@ -1,14 +1,5 @@
 import { Button } from "@/components/ui/button"
-import {
-    Sheet,
-    SheetClose,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, LogOut, User, Settings } from "lucide-react"
 import { Dialog } from "./ui/dialog"
 import DialogComponent from "./DialogComponent"
@@ -17,7 +8,7 @@ import { api } from "@/lib/axios"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-
+import { AxiosError } from "axios"
 
 export function SheetComponent() {
     const [role, setUserRole] = useState("user")
@@ -39,8 +30,9 @@ export function SheetComponent() {
                 toast.success("Logged out successfully!");
                 router.push("/auth/login");
             }
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.message || "Failed to logout. Please try again.";
+        } catch (err) {
+            const error = err as AxiosError<{message: string}>
+            const errorMessage = error.response?.data?.message || "Failed to logout. Please try again.";
             toast.error(errorMessage);
         }
     }

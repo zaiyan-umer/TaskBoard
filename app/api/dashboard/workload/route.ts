@@ -89,8 +89,10 @@ export async function GET() {
     }
     catch (error) {
         console.error("Internal Server Error: ", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
         return NextResponse.json({
-            message: "Internal Server Error"
+            message: errorMessage
         }, { status: 500 })
     }
 }

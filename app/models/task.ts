@@ -1,6 +1,6 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-export interface TaskInterface{
+export interface TaskInterface {
     title: string,
     description: string,
     status: 'todo' | 'in-progress' | 'done',
@@ -8,9 +8,16 @@ export interface TaskInterface{
     dueDate?: Date,
     createdBy: mongoose.Types.ObjectId,
     assignedTo: mongoose.Types.ObjectId,
-    createdAt? : Date,
-    updatedAt? : Date,
-    _id? : mongoose.Types.ObjectId
+    createdAt?: Date,
+    updatedAt?: Date,
+    _id?: mongoose.Types.ObjectId
+}
+
+export interface PopulatedTask extends Omit<TaskInterface, 'createdBy'> {
+    createdBy: {
+        _id: mongoose.Types.ObjectId;
+        username: string;
+    };
 }
 
 const TaskSchema = new Schema({

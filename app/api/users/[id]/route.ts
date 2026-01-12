@@ -35,7 +35,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         }
 
         if (currUser.role !== 'admin') {
-        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
         const user = await User.findById(id).select("-password");
@@ -50,14 +50,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     catch (error) {
         console.error("Error while fetching specific user: ", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
         return NextResponse.json({
-            message: "Error while fetching specific user"
+            message: errorMessage
         }, { status: 400 })
     }
 
 }
 
-export async function DELETE( request: NextRequest, { params }: { params: Promise<{ id: string }> }){
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     if (!id) {
@@ -98,6 +100,8 @@ export async function DELETE( request: NextRequest, { params }: { params: Promis
         return NextResponse.json({ message: "User deleted successfully" }, { status: 200 });
     } catch (error) {
         console.error("Error while deleting user:", error);
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
+        return NextResponse.json({ message: errorMessage }, { status: 500 });
     }
 }

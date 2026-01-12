@@ -50,6 +50,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   } catch (error) {
     console.error("Error while updating user's role:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
+    return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }

@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server";
 
-export async function GET(){
-    try{
+export async function GET() {
+    try {
         const response = NextResponse.json({
             message: "Logged out successfully"
-        }, {status : 200})
+        }, { status: 200 })
 
         response.cookies.delete('token');
 
         return response;
     }
-    catch(err){
-        console.log("Error while logging out: ", err);
-        
+    catch (error) {
+        console.log("Error while logging out: ", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
+
         return NextResponse.json({
-            message: "Error during logout"
+            message: errorMessage
         }, { status: 500 })
     }
 }
