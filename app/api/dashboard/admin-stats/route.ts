@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         const mediumPriorityCount = await Task.countDocuments({ priority: "medium" });
         const lowPriorityCount = await Task.countDocuments({ priority: "low" });
         const todoCount = await Task.countDocuments({ status: "todo" });
-        const inProgressCount = await Task.countDocuments({ status: "in-progress" });
+        const inProgressCount = await Task.countDocuments({ status: "in_progress" });
         const doneCount = await Task.countDocuments({ status: "done" });
 
         return NextResponse.json({
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
             HighPriority: highPriorityCount,
             MediumPriority: mediumPriorityCount,
             LowPriority: lowPriorityCount,
-            ToDo: todoCount,
+            Todo: todoCount,
             InProgress: inProgressCount,
             Done: doneCount
         }, { status: 200 })

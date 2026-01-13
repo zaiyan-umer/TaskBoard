@@ -1,10 +1,11 @@
 'use client'
 import CardComponent from '@/components/CardComponent'
 import { SheetComponent } from '@/components/SheetComponent';
+import UserPieChart from '@/components/UserPieChart';
 import { useFetchTasks } from '@/hooks/useFetchTasks';
 
 const Page = () => {
-  const {tasks, loading} = useFetchTasks();
+  const { tasks, loading } = useFetchTasks();
 
   const getPriorityAccentColor = (priority: string) => {
     switch (priority) {
@@ -18,17 +19,23 @@ const Page = () => {
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 pt-16">
       <SheetComponent />
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mt-4">
-        {tasks.map((task) => {
-          const colors = getPriorityAccentColor(task.priority);
-          return (
-            <CardComponent
-              task={task}
-              key={task._id?.toString()}
-              colors={colors}
-            />
-          );
-        })}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mt-4 col-span-2">
+          {tasks.map((task) => {
+            const colors = getPriorityAccentColor(task.priority);
+            return (
+              <CardComponent
+                task={task}
+                key={task._id?.toString()}
+                colors={colors}
+              />
+            );
+          })}
+        </div>
+        <div className="col-span-1 space-y-5">
+          <UserPieChart tasks={tasks} />
+        </div>
       </div>
     </div>
   )

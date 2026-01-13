@@ -45,7 +45,7 @@ const CardComponent = ({ task, colors }: {task: PopulatedTask, colors: Color}) =
     };
 
     return (
-        <Card className={`border-2 relative shadow-lg hover:shadow-xl transition-all duration-300 ${getPriorityBorderColor(task.priority)} flex flex-col`}>
+        <Card className={`max-h-100 border-2 relative shadow-lg hover:shadow-xl transition-all duration-300 ${getPriorityBorderColor(task.priority)} flex flex-col`}>
             <CardHeader className="space-y-3 sm:space-y-4 pb-4 flex-1">
                 <div className="flex items-start justify-between gap-3 sm:gap-4">
                     <CardTitle className='text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 wrap-break-word'>
