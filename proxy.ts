@@ -5,7 +5,7 @@ const PUBLIC_ROUTES = [
     "/auth/register",
 ]
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl
 
     // Read token + role from cookies
@@ -40,7 +40,8 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: [
-        "/((?!_next/static|_next/image|favicon.ico).*)",
-    ],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico).*)"
+  ]
 }
+

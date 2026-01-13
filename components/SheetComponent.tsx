@@ -28,7 +28,7 @@ export function SheetComponent() {
                     </SheetHeader>
                     <div className="grid flex-1 auto-rows-min gap-4 py-4">
                         {/* Create Task Button */}
-                        <DialogComponent  />
+                        <DialogComponent/>
 
                         <Separator />
 
