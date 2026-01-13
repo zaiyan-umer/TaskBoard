@@ -4,8 +4,8 @@ import { Menu, LogOut, User, Settings } from "lucide-react"
 import { Dialog } from "./ui/dialog"
 import DialogComponent from "./DialogComponent"
 import { Separator } from "@/components/ui/separator"
-import { useGetRole } from "@/app/hooks/useGetRole"
-import { useLogout } from "@/app/hooks/useAuth"
+import { useGetRole } from "@/hooks/useGetRole"
+import { useLogout } from "@/hooks/useAuth"
 
 export function SheetComponent() {
     const { role, loading } = useGetRole();

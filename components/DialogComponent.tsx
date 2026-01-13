@@ -1,14 +1,14 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChevronDownIcon, Plus } from "lucide-react"
-import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
+import { ChevronDownIcon, Plus } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useCreateTask } from "@/app/hooks/useCreateTask"
-import { useUsers } from "@/app/hooks/useUsers"
+import { useCreateTask } from "@/hooks/useCreateTask"
+import { useUsers } from "@/hooks/useUsers"
 
 export default function DialogComponent({ role }: { role?: string }) {
     const [open, setOpen] = useState(false)

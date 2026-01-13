@@ -1,6 +1,6 @@
-import { connectToDB } from "@/app/lib/db";
-import Task, { TaskInterface } from "@/app/models/task";
-import User from "@/app/models/user";
+import { connectToDB } from "@/lib/db";
+import Task, { TaskInterface } from "@/models/task";
+import User from "@/models/user";
 import mongoose from "mongoose";
 import { NextResponse, NextRequest } from "next/server";
 import { canDeleteTask, canUpdateTask, canViewTask } from "@/app/controllers/permissions";

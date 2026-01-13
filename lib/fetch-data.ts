@@ -1,4 +1,4 @@
-import { IUser } from "@/app/models/user"
+import { IUser } from "@/models/user"
 import { api } from "./axios"
 
 

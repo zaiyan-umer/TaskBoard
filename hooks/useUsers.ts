@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { fetchAllUsers } from "@/lib/fetch-data"
-import { IUser } from "@/app/models/user"
+import { IUser } from "@/models/user"
 
 export function useUsers(role?: string) {
   const [users, setUsers] = useState<IUser[]>([])

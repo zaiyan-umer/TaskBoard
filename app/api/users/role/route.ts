@@ -1,6 +1,6 @@
 import { getUserIdByCookies } from "@/app/controllers/helpers"
-import { connectToDB } from "@/app/lib/db";
-import User from "@/app/models/user";
+import { connectToDB } from "@/lib/db";
+import User from "@/models/user";
 import { NextResponse } from "next/server";
 
 

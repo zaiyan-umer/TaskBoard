@@ -1,7 +1,7 @@
 'use client'
 import CardComponent from '@/components/CardComponent'
 import { SheetComponent } from '@/components/SheetComponent';
-import { useFetchTasks } from './hooks/useFetchTasks';
+import { useFetchTasks } from '@/hooks/useFetchTasks';
 
 const Page = () => {
   const {tasks, loading} = useFetchTasks();

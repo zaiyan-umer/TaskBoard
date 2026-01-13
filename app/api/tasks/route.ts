@@ -1,6 +1,6 @@
-import { connectToDB } from "@/app/lib/db";
-import Task from "@/app/models/task";
-import User from "@/app/models/user";
+import { connectToDB } from "@/lib/db";
+import Task from "@/models/task";
+import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import { getUserIdByCookies } from "@/app/controllers/helpers";
 

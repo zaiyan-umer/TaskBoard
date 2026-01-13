@@ -5,9 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash, User } from 'lucide-react';
 import { toast } from "sonner"; 
 import { Button } from "./ui/button"; 
-import { PopulatedTask, TaskStatus } from "@/app/models/task"; 
-import { useDeleteTask } from "@/app/hooks/useDeleteTask";
-import { useUpdateTaskStatus } from "@/app/hooks/useUpdateTaskStatus";
+import { PopulatedTask, TaskStatus } from "@/models/task"; 
+import { useDeleteTask } from "@/hooks/useDeleteTask";
+import { useUpdateTaskStatus } from "@/hooks/useUpdateTaskStatus";
 
 type Color = {
     bg: string; border: string; icon: string; text: string; badge: string

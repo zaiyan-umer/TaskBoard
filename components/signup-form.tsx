@@ -9,7 +9,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { useSignup } from "@/app/hooks/useAuth"
+import { useSignup } from "@/hooks/useAuth"
 
 export function SignupForm({ className, ...props }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
