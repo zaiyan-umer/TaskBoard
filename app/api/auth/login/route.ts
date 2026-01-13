@@ -33,11 +33,16 @@ export async function POST(request: NextRequest) {
 
         const token = jwt.sign({ userId: existingUser._id }, process.env.JWT_SECRET!, { expiresIn: '1d' });
 
-        const response = NextResponse.json({ message: "Login successful", id: existingUser._id, role: existingUser.role }, { status: 200 })
+        const userWithoutPassword = existingUser.toObject();
+        delete userWithoutPassword.password;
+
+        const response = NextResponse.json({ message: "Login successful", user: userWithoutPassword }, { status: 200 })
 
         response.cookies.set("token", token, {
             httpOnly: true
         });
+
+        response.cookies.set("role", existingUser.role, {httpOnly: true});
 
         return response;
     }

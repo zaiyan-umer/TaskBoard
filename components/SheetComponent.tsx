@@ -2,13 +2,11 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, LogOut, User, Settings } from "lucide-react"
 import { Dialog } from "./ui/dialog"
-import DialogComponent from "./DialogComponent"
+import DialogComponent from "./tasks/DialogComponent"
 import { Separator } from "@/components/ui/separator"
-import { useGetRole } from "@/hooks/useGetRole"
 import { useLogout } from "@/hooks/useAuth"
 
 export function SheetComponent() {
-    const { role, loading } = useGetRole();
     const { logout } = useLogout();
 
     const logoutHandler = async () => {
@@ -30,7 +28,7 @@ export function SheetComponent() {
                     </SheetHeader>
                     <div className="grid flex-1 auto-rows-min gap-4 py-4">
                         {/* Create Task Button */}
-                        <DialogComponent role={role ?? undefined} />
+                        <DialogComponent  />
 
                         <Separator />
 

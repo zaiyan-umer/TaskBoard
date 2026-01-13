@@ -6,11 +6,13 @@ import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { useSetUser } from "@/store/auth.store"
 
 export function useLogin() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string>("")
     const router = useRouter()
+    const setUser = useSetUser()
 
     const login = async ({ email, password }: { email: string; password: string }) => {
         setError("")
@@ -24,7 +26,9 @@ export function useLogin() {
 
             toast.success("Login successful!")
 
-            router.push(res.data.role === "admin" ? "/dashboard" : "/")
+            setUser(res.data.user);
+
+            router.push(res.data.user.role === "admin" ? "/dashboard" : "/")
             return true
         } catch (err) {
             const error = err as AxiosError<{ message: string }>
@@ -32,6 +36,7 @@ export function useLogin() {
                 error.response?.data?.message || "Failed to login. Please try again."
 
             setError(message)
+            setUser(null);
             toast.error(message)
             return false
         } finally {
@@ -81,6 +86,7 @@ export function useLogout() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string>("")
     const router = useRouter()
+    const setUser = useSetUser()
 
     const logout = async () => {
         setError("")
@@ -92,6 +98,7 @@ export function useLogout() {
             if (res.status === 200) {
                 toast.success("Logged out successfully!");
                 router.push("/auth/login");
+                setUser(null);
                 return true
             }
         } catch (err) {
