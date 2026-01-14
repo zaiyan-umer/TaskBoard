@@ -16,76 +16,30 @@ A comprehensive full-stack task management application with role-based access co
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **Next.js 16** - React framework with App Router
-- **React 19** - UI library
-- **TypeScript** - Type-safe development
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **Radix UI** - Accessible headless components
-- **Recharts** - Data visualization library
-- **Zustand** - State management
-- **Axios** - HTTP client
-- **Lucide React** - Icon library
-- **Sonner** - Toast notifications
+### Frontend: 
+- Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui, Zustand, Recharts, Axios, Lucide React, Sonner
+### Backend: 
+- Next.js API Routes, Node.js, MongoDB + Mongoose, bcrypt, JWT
+  
+## 📊 Architecture & Flow
+<img width="3123" height="1470" alt="flowchart" src="https://github.com/user-attachments/assets/a6823306-a5d8-42da-bf80-729901728053" />
+<img width="1883" height="871" alt="gh-1" src="https://github.com/user-attachments/assets/406def8e-3b8d-4bfc-8763-671592b9ac45" />
+<img width="1157" height="435" alt="gh-2" src="https://github.com/user-attachments/assets/fdc4bda4-7185-4b14-a236-8d92d7d1beeb" />
 
-### Backend
-- **Next.js API Routes** - Serverless backend
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB ORM
-- **bcrypt** - Password hashing
-- **JWT** - Authentication tokens
 
 ## 📋 Project Structure
 
 ```
 task-manager/
-├── app/                          # Next.js App Router
-│   ├── api/                      # API routes
-│   │   ├── auth/                 # Authentication endpoints
-│   │   │   ├── login/
-│   │   │   ├── register/
-│   │   │   ├── logout/
-│   │   │   └── me/
-│   │   ├── tasks/                # Task CRUD operations
-│   │   ├── users/                # User management
-│   │   └── dashboard/            # Dashboard stats
-│   ├── auth/                     # Auth pages
-│   │   ├── login/
-│   │   └── register/
-│   ├── admin-panel/              # Admin interface
-│   ├── profile/                  # User profile page
-│   ├── layout.tsx                # Root layout
-│   └── page.tsx                  # Home page
-├── components/                   # React components
-│   ├── auth/                     # Authentication components
-│   ├── card-components/          # Card layouts
-│   ├── PieCharts/                # Chart components
-│   ├── tasks/                    # Task-related components
-│   └── ui/                       # Radix UI primitives
-├── controllers/                  # Business logic
-│   ├── helpers.ts                # Utility functions
-│   └── permissions.ts            # Role-based permissions
-├── hooks/                        # Custom React hooks
-│   ├── useAuth.ts                # Authentication hook
-│   ├── useCreateTask.ts          # Task creation
-│   ├── useDeleteTask.ts          # Task deletion
-│   ├── useFetchTasks.ts          # Task fetching
-│   └── useStats.ts               # Statistics
-├── lib/                          # Utilities
-│   ├── axios.ts                  # Axios configuration
-│   ├── db.ts                     # Database connection
-│   └── utils.ts                  # Helper utilities
-├── models/                       # MongoDB schemas
-│   ├── task.ts                   # Task model
-│   └── user.ts                   # User model
-├── store/                        # Zustand stores
-│   ├── auth.store.ts             # Auth state
-│   └── tasks.store.ts            # Tasks state
-├── public/                       # Static assets
-├── package.json                  # Dependencies
-├── tsconfig.json                 # TypeScript config
-├── tailwind.config.ts            # Tailwind configuration
-└── next.config.ts                # Next.js configuration
+├── app/             # Pages & API routes
+├── components/      # UI components & charts
+├── controllers/     # Business logic
+├── hooks/           # Custom React hooks
+├── lib/             # Utilities
+├── models/          # MongoDB schemas
+├── store/           # Zustand stores
+├── public/          # Static assets
+└── next.config.ts   # Next.js config
 ```
 
 ## 🔌 API Endpoints
@@ -128,7 +82,7 @@ task-manager/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/zaiyan-umer/TaskBoard.git
    cd task-manager
    ```
 
@@ -162,12 +116,11 @@ npm start
 
 ## 📱 Pages
 
-- **Home** (`/`) - Landing/home page
 - **Login** (`/auth/login`) - User login
 - **Register** (`/auth/register`) - User registration
+- **Dashboard** (`/`) - User dashboard (home page)
 - **Profile** (`/profile`) - User profile management
 - **Admin Panel** (`/admin-panel`) - Admin dashboard
-- **Dashboard** - User dashboard (redirects based on role)
 
 ## 🔐 Authentication
 
@@ -179,17 +132,9 @@ The app uses JWT-based authentication with:
 
 ## 🎨 UI Components
 
-Custom Radix UI-based components:
-- **Badge** - Status indicators
-- **Button** - Interactive buttons
-- **Card** - Content containers
-- **Dialog** - Modal dialogs
-- **Input** - Text input fields
-- **Select** - Dropdown selections
-- **Calendar** - Date picker
-- **Separator** - Visual dividers
-- **Tooltip** - Hover information
-- **Dropdown Menu** - Menu options
+- Radix UI-based components (Cards, Buttons, Dialogs, Inputs, etc.)
+- Charts with Recharts for task stats and workload visualization
+- Responsive and mobile-friendly design
 
 ## 📊 Data Visualization
 
