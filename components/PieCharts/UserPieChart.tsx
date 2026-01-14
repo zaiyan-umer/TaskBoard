@@ -1,12 +1,12 @@
 'use client'
 import { RoundedPieChart } from './RoundedPieChart'
-import { ChartConfig } from './ui/chart'
-import { useMyStats } from '@/hooks/useMyStats'
+import { ChartConfig } from '../ui/chart'
+import { useStats } from '@/hooks/useStats'
 
 
 const UserPieChart = ({tasks}) => {
 
-    const {taskStatuses, taskPriorities} = useMyStats(tasks);
+    const {taskStatuses, taskPriorities} = useStats(tasks, 'my-stats');
 
     const statusChartData = [
         { status: 'Todo', count: taskStatuses.Todo, fill: 'var(--chart-1)' },

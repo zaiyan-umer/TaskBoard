@@ -1,4 +1,4 @@
-import { getUserIdByCookies } from "@/app/controllers/helpers"
+import { getUserIdByCookies } from "@/controllers/helpers"
 import { connectToDB } from "@/lib/db";
 import Task from "@/models/task";
 import User from "@/models/user";

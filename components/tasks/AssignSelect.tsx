@@ -1,5 +1,4 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useUser } from "@/store/auth.store"
 import { useUsers } from "@/hooks/useUsers"
 
 type TaskFormData = {
@@ -13,10 +12,10 @@ type TaskFormData = {
 type AssignSelectProps = {
   formData: TaskFormData
   setFormData: (updater: (prev: TaskFormData) => TaskFormData) => void
+  role: string
 }
 
-export function AssignSelect({ formData, setFormData }: AssignSelectProps) {
-  const role = useUser()?.role ?? "user"
+export function AssignSelect({ formData, setFormData, role }: AssignSelectProps) {
   const { users, loading } = useUsers(role)
 
   if (loading) return <p>Loading users...</p>

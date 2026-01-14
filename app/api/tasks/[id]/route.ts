@@ -3,8 +3,8 @@ import Task, { TaskInterface } from "@/models/task";
 import User from "@/models/user";
 import mongoose from "mongoose";
 import { NextResponse, NextRequest } from "next/server";
-import { canDeleteTask, canUpdateTask, canViewTask } from "@/app/controllers/permissions";
-import { getUserIdByCookies } from "@/app/controllers/helpers";
+import { canDeleteTask, canUpdateTask, canViewTask } from "@/controllers/permissions";
+import { getUserIdByCookies } from "@/controllers/helpers";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -141,7 +141,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             message: "Invalid priority value"
         }, { status: 400 })
     }
-    let parsedDueDate = undefined;
+    let parsedDueDate: undefined | Date = undefined;
     if (dueDate) {
         parsedDueDate = new Date(dueDate);
         if (isNaN(parsedDueDate.getTime())) {

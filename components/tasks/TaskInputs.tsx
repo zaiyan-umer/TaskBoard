@@ -26,6 +26,7 @@ type TaskInputsProps = {
 export function TaskInputs({ formData, setFormData, handleSubmit, loading, setOpen }: TaskInputsProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false)
   const user = useUser();
+  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -94,7 +95,7 @@ export function TaskInputs({ formData, setFormData, handleSubmit, loading, setOp
         </div>
         {
           user?.role === "admin" &&
-          <AssignSelect formData={formData} setFormData={setFormData} />
+          <AssignSelect formData={formData} setFormData={setFormData} role={user?.role}/>
         }
 
         {/* Due Date Input */}

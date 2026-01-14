@@ -2,7 +2,7 @@ import { connectToDB } from "@/lib/db";
 import Task from "@/models/task";
 import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
-import { getUserIdByCookies } from "@/app/controllers/helpers";
+import { getUserIdByCookies } from "@/controllers/helpers";
 
 export async function POST(request: NextRequest) {
     const { title, description, priority, dueDate, assignedTo = '' } = await request.json();
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
     }
 
-    let parsedDueDate = undefined;
+    let parsedDueDate: undefined | Date = undefined;
     // When creating/updating tasks
     if (dueDate) {
         parsedDueDate = new Date(dueDate);

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react"
-import { PopulatedTask } from "../models/task"
 import { api } from "@/lib/axios"
+import { useSetTasks, useTasks } from "@/store/tasks.store"
 
 export function useFetchTasks() {
-  const [tasks, setTasks] = useState<PopulatedTask[]>([])
   const [loading, setLoading] = useState(true)
+  const setTasks = useSetTasks();
+  const tasks = useTasks();
 
   const fetchTasks = useCallback(async () => {
     try {

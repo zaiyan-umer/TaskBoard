@@ -1,5 +1,5 @@
-import { getUserIdByCookies } from "@/app/controllers/helpers";
-import { canUpdateStatus } from "@/app/controllers/permissions";
+import { getUserIdByCookies } from "@/controllers/helpers";
+import { canUpdateStatus } from "@/controllers/permissions";
 import { connectToDB } from "@/lib/db";
 import Task from "@/models/task";
 import User from "@/models/user";

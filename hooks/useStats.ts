@@ -27,7 +27,7 @@ type StatsResponse = {
     LowPriority?: number
 }
 
-export function useMyStats( tasks ) {
+export function useStats( tasks, endpoint ) {
     const [taskStatuses, setTaskStatuses] = useState<TaskStatuses>({
         Todo: 0,
         InProgress: 0,
@@ -45,7 +45,7 @@ export function useMyStats( tasks ) {
 
         const fetchStats = async () => {
             try {
-                const res = await api.get<StatsResponse>('/dashboard/my-stats')
+                const res = await api.get<StatsResponse>(`/dashboard/${endpoint}`)
                 const {
                     Todo = 0,
                     InProgress = 0,
