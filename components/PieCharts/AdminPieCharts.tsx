@@ -64,7 +64,7 @@ const AdminPieCharts = () => {
                 chartData={statusChartData}
                 chartConfig={statusChartConfig}
                 title="Status breakdown"
-                description=""
+                description="All Tasks"
                 dataKey="count"
                 nameKey="status"
             />
@@ -72,7 +72,7 @@ const AdminPieCharts = () => {
                 chartData={priorityChartData}
                 chartConfig={priorityChartConfig}
                 title="Priority breakdown"
-                description=""
+                description="All Tasks"
                 dataKey="count"
                 nameKey="priority"
             />

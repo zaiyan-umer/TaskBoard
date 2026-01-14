@@ -25,12 +25,12 @@ export function proxy(req: NextRequest) {
     // Logged-in user trying to access login/register
     if (token && isPublicRoute) {
         return NextResponse.redirect(
-            new URL(role === "admin" ? "/dashboard" : "/", req.url)
+            new URL(role === "admin" ? "/admin-panel" : "/", req.url)
         )
     }
 
     // Non-admin trying to access dashboard
-    if (pathname.startsWith("/dashboard") && role !== "admin") {
+    if (pathname.startsWith("/admin-panel") && role !== "admin") {
         return NextResponse.redirect(
             new URL("/", req.url)
         )

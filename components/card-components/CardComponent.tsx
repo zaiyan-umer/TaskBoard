@@ -3,19 +3,22 @@ import { Card, CardDescription, CardContent, CardHeader, CardTitle } from "@/com
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash, User } from 'lucide-react';
-import { toast } from "sonner"; 
-import { Button } from "./ui/button"; 
-import { PopulatedTask, TaskStatus } from "@/models/task"; 
+import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { PopulatedTask, TaskStatus } from "@/models/task";
 import { useDeleteTask } from "@/hooks/useDeleteTask";
 import { useUpdateTaskStatus } from "@/hooks/useUpdateTaskStatus";
+import { useUser } from "@/store/auth.store";
 
 type Color = {
     bg: string; border: string; icon: string; text: string; badge: string
 }
 
-const CardComponent = ({ task, colors }: {task: PopulatedTask, colors: Color}) => {
-    const {deleteTask} = useDeleteTask();
-    const {status, updateStatus, loading} = useUpdateTaskStatus(task.status as TaskStatus);
+const CardComponent = ({ task, colors }: { task: PopulatedTask, colors: Color }) => {
+    const { deleteTask } = useDeleteTask();
+    const user = useUser()
+
+    const { status, updateStatus, loading } = useUpdateTaskStatus(task.status as TaskStatus);
 
     const handleDelete = async () => {
         await deleteTask(task._id?.toString() as string);
@@ -26,7 +29,7 @@ const CardComponent = ({ task, colors }: {task: PopulatedTask, colors: Color}) =
             toast.error("Invalid task")
             return
         }
-        await updateStatus(task._id?.toString(), newStatus);  
+        await updateStatus(task._id?.toString(), newStatus);
     };
 
     const formatDate = (date: string | Date | undefined) => {
@@ -78,8 +81,16 @@ const CardComponent = ({ task, colors }: {task: PopulatedTask, colors: Color}) =
                     <div className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 ${colors.bg} rounded-lg border ${colors.border}`}>
                         <User className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${colors.icon}`} />
                         <span className="text-gray-700 dark:text-gray-300 font-medium">
-                            <span className="hidden sm:inline">Created by: </span>
-                            <span className={`${colors.text} font-semibold`}>{task.createdBy.username}</span>
+                            {
+                                user?.role === "admin" ? <>
+                                    <span className="hidden sm:inline">Assigned To: </span>
+                                    <span className={`${colors.text} font-semibold`}>{task?.assignedTo?.username}</span>
+                                </> :
+                                    <>
+                                        <span className="hidden sm:inline">Created by: </span>
+                                        <span className={`${colors.text} font-semibold`}>{task.createdBy.username}</span>
+                                    </>
+                            }
                         </span>
                     </div>
                     <div className="text-gray-500 dark:text-gray-400 px-2.5 sm:px-0">

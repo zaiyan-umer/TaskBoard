@@ -1,19 +1,24 @@
 'use client'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, LogOut, User, Settings } from "lucide-react"
+import { Menu, LogOut, User, Settings, LayoutDashboard } from "lucide-react"
 import { Dialog } from "./ui/dialog"
 import DialogComponent from "./tasks/DialogComponent"
 import { Separator } from "@/components/ui/separator"
 import { useLogout } from "@/hooks/useAuth"
+import { useUser } from "@/store/auth.store"
+import { useRouter } from "next/navigation"
 
 export function SheetComponent() {
     const { logout } = useLogout();
+    const router = useRouter();
 
     const logoutHandler = async () => {
         await logout();
     }
-    
+
+    const user = useUser();
+
     return (
         <Sheet>
             <Dialog>
@@ -29,20 +34,25 @@ export function SheetComponent() {
                     </SheetHeader>
                     <div className="grid flex-1 auto-rows-min gap-4 py-4">
                         {/* Create Task Button */}
-                        <DialogComponent/>
-
+                        <DialogComponent />
                         <Separator />
 
                         {/* User Profile Section */}
                         <div className="grid gap-2">
-                            <Button variant="ghost" className="justify-start cursor-pointer">
+                            <Button variant="ghost" className="justify-start cursor-pointer" onClick={() => router.push('/profile')}>
                                 <User className="mr-2 h-4 w-4" />
                                 Profile
                             </Button>
-                            <Button variant="ghost" className="justify-start cursor-pointer">
-                                <Settings className="mr-2 h-4 w-4" />
-                                Settings
+                            <Button variant="ghost" className="justify-start cursor-pointer" onClick={() => router.push('/')}>
+                                <LayoutDashboard className="mr-2 h-4 w-4" />
+                                Dashboard
                             </Button>
+                            {user?.role === "admin" &&
+                                <Button variant="ghost" className="justify-start cursor-pointer" onClick={() => router.push('/admin-panel')}>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    Admin Panel
+                                </Button>
+                            }
                         </div>
 
                         <Separator />

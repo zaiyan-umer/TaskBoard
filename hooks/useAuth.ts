@@ -28,8 +28,7 @@ export function useLogin() {
 
             setUser(res.data.user);
             
-
-            router.push(res.data.user.role === "admin" ? "/dashboard" : "/")
+            router.push(res.data.user.role === "admin" ? "/admin-panel" : "/")
             return true
         } catch (err) {
             const error = err as AxiosError<{ message: string }>

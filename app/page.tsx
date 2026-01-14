@@ -1,5 +1,5 @@
 'use client'
-import Cards from '@/components/Cards';
+import Cards from '@/components/card-components/Cards';
 import UserPieChart from '@/components/PieCharts/UserPieChart';
 import { useFetchTasks } from '@/hooks/useFetchTasks';
 

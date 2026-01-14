@@ -3,9 +3,7 @@ import { api } from "./axios"
 
 
 export async function fetchAllUsers(): Promise<IUser[]> {
-    const res = await api.get("/users");
-    console.log(res.data.users);
-    
+    const res = await api.get("/users");    
     return res.data.users;
 }
 

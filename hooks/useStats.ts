@@ -59,7 +59,6 @@ export function useStats( tasks, endpoint ) {
 
                 setTaskStatuses({ Todo, InProgress, Done })
                 setTaskPriorities({ HighPriority, MediumPriority, LowPriority })
-                toast.success('Fetched')
                 return true
             } catch (error) {
                 const errorMessage = error as AxiosError<{ message: string }>

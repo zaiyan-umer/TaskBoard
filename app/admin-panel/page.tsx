@@ -3,7 +3,7 @@ import WorkloadAllUsers from '@/components/WorkloadAllUsers'
 
 const Dashboard = () => {
     return (
-        <div className='grid grid-cols-3 m-8 max-w-16xl'>
+        <div className='grid grid-cols-1 sm:grid-cols-3 m-8 max-w-16xl'>
             <div className="col-span-2">
                 <WorkloadAllUsers />
             </div>

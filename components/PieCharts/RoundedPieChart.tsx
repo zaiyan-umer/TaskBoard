@@ -51,7 +51,7 @@ export function RoundedPieChart({
                         <span>5.2%</span>
                     </Badge>
                 </CardTitle>
-                <CardDescription>{description}</CardDescription>
+                <CardDescription className="text-center">{description}</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
                 <ChartContainer

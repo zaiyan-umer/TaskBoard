@@ -58,6 +58,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                   onChange={e => setUsername(e.target.value)}
                   id="username"
                   type="text"
+                  placeholder="johndoe"
                 />
               </Field>
               <Field>

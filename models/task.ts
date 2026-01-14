@@ -20,6 +20,10 @@ export interface PopulatedTask extends Omit<TaskInterface, 'createdBy'> {
         _id: mongoose.Types.ObjectId;
         username: string;
     };
+    assignedTo?: {
+        _id: mongoose.Types.ObjectId;
+        username: string;
+    };
 }
 
 const TaskSchema = new Schema({

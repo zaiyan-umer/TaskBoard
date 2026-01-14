@@ -25,7 +25,7 @@ export async function GET() {
             return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
-        const users = await User.find({}, "username email");
+        const users = await User.find({}, "username email role");
 
         return NextResponse.json({
             message: "Successfully returned users",
