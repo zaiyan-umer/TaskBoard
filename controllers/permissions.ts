@@ -1,5 +1,5 @@
-import { IUser } from "../../models/user";
-import { TaskInterface } from "../../models/task";
+import { IUser } from "@/models/user";
+import { TaskInterface } from "@/models/task";
 
 export function canViewTask(user: IUser, task: TaskInterface) {
   if (user.role === "admin") return true;
