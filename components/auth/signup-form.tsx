@@ -39,6 +39,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
+                 autoComplete="off"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   onBlur={() => {
@@ -54,6 +55,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
               <Field>
                 <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
+                  autoComplete="off"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
                   id="username"

@@ -38,6 +38,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
+                  autoComplete="off"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   onBlur={() => {

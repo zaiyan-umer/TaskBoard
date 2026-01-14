@@ -4,14 +4,14 @@ import { ChartConfig } from '../ui/chart'
 import { useStats } from '@/hooks/useStats'
 
 
-const UserPieChart = ({tasks}) => {
+const UserPieChart = ({ tasks }) => {
 
-    const {taskStatuses, taskPriorities} = useStats(tasks, 'my-stats');
+    const { taskStatuses, taskPriorities } = useStats(tasks, 'my-stats');
 
     const statusChartData = [
-        { status: 'Todo', count: taskStatuses.Todo, fill: 'var(--chart-1)' },
-        { status: 'InProgress', count: taskStatuses.InProgress, fill: 'var(--chart-3)' },
-        { status: 'Done', count: taskStatuses.Done, fill: 'var(--chart-5)' },
+        { status: 'Todo', count: taskStatuses.Todo, fill: 'var(--chart-todo)' },
+        { status: 'InProgress', count: taskStatuses.InProgress, fill: 'var(--chart-in-progress)' },
+        { status: 'Done', count: taskStatuses.Done, fill: 'var(--chart-done)' },
     ]
 
     const statusChartConfig = {
@@ -20,22 +20,22 @@ const UserPieChart = ({tasks}) => {
         },
         Todo: {
             label: 'Todo',
-            color: 'var(--chart-1)',
+            color: 'var(--chart-todo)',
         },
         InProgress: {
             label: 'In Progress',
-            color: 'var(--chart-3)',
+            color: 'var(--chart-in-progress)',
         },
         Done: {
             label: 'Done',
-            color: 'var(--chart-5)',
+            color: 'var(--chart-done)',
         },
     } satisfies ChartConfig
 
     const priorityChartData = [
-        { priority: 'HighPriority', count: taskPriorities.HighPriority, fill: 'var(--chart-red)' },
-        { priority: 'MediumPriority', count: taskPriorities.MediumPriority, fill: 'var(--chart-2)' },
-        { priority: 'LowPriority', count: taskPriorities.LowPriority, fill: 'var(--chart-4)' },
+        { priority: 'HighPriority', count: taskPriorities.HighPriority, fill: 'var(--chart-priority-high)' },
+        { priority: 'MediumPriority', count: taskPriorities.MediumPriority, fill: 'var(--chart-priority-medium)' },
+        { priority: 'LowPriority', count: taskPriorities.LowPriority, fill: 'var(--chart-priority-low)' },
     ]
 
     const priorityChartConfig = {
@@ -44,17 +44,17 @@ const UserPieChart = ({tasks}) => {
         },
         HighPriority: {
             label: 'High Priority',
-            color: 'var(--chart-red)',
+            color: 'var(--chart-priority-high)',
         },
         MediumPriority: {
             label: 'Medium Priority',
-            color: 'var(--chart-2)',
+            color: 'var(--chart-priority-medium)',
         },
         LowPriority: {
             label: 'Low Priority',
-            color: 'var(--chart-4)',
+            color: 'var(--chart-priority-low)',
         },
-    } satisfies ChartConfig
+    } satisfies ChartConfig;
 
 
     return (

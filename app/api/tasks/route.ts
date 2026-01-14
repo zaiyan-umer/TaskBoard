@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserIdByCookies } from "@/controllers/helpers";
 
 export async function POST(request: NextRequest) {
-    const { title, description, priority, dueDate, assignedTo = '' } = await request.json();
+    const { title, description, status, priority, dueDate, assignedTo = '' } = await request.json();
 
     const trimmedTitle = title?.trim();
     const trimmedDescription = description?.trim();
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         }
 
         const task = await Task.create({
-            title: trimmedTitle, description: trimmedDescription, priority, dueDate: parsedDueDate, createdBy: user._id, assignedTo: assignedUserId
+            title: trimmedTitle, description: trimmedDescription, status, priority, dueDate: parsedDueDate, createdBy: user._id, assignedTo: assignedUserId
         })
 
         return NextResponse.json({
