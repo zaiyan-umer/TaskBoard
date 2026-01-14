@@ -15,7 +15,7 @@ export interface TaskInterface {
     _id?: mongoose.Types.ObjectId
 }
 
-export interface PopulatedTask extends Omit<TaskInterface, 'createdBy'> {
+export interface PopulatedTask extends Omit<TaskInterface, 'createdBy' | 'assignedTo'> {
     createdBy: {
         _id: mongoose.Types.ObjectId;
         username: string;
