@@ -1,28 +1,26 @@
 import { api } from "@/lib/axios"
-import { useState } from "react"
-import { toast } from "sonner"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
+async function deleteTask(id: string) {
+    const res = await api.delete(`/tasks/${id}`)
+    return res.data;
+}
 
 export function useDeleteTask() {
-    const [loading, setIsLoading] = useState<true | false>(false)
-
-    const deleteTask = async (taskId: string) => {
-        setIsLoading(true)
-        try {
-            const res = await api.delete(`/tasks/${taskId}`)
-            if (res.status === 200) {
-                toast.success("Task deleted successfully!")
-                window.dispatchEvent(new CustomEvent('task:deleted'))
-                return true;
-            }
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Failed to delete task"
-            toast.error(errorMessage)
-            return false;
-        } finally {
-            setIsLoading(false)
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => deleteTask(id),
+        onError: (error) => {
+            const axiosError = error as AxiosError<{ message: string }>;
+            toast.error(axiosError.response?.data?.message || "Failed to delete task");
+        },
+        onSuccess: () => {
+            toast.success("Task deleted successfully");
+            queryClient.invalidateQueries({ queryKey: ["tasks"] });
+            queryClient.invalidateQueries({ queryKey: ["stats"] });
+            queryClient.invalidateQueries({ queryKey: ["workload"] });
         }
-    }
-
-    return {deleteTask, loading};
+    })
 }

@@ -10,11 +10,11 @@ import { useUser } from "@/store/auth.store"
 import { useRouter } from "next/navigation"
 
 export function SheetComponent() {
-    const { logout } = useLogout();
+    const { mutate: logout } = useLogout();
     const router = useRouter();
 
     const logoutHandler = async () => {
-        await logout();
+        logout();
     }
 
     const user = useUser();

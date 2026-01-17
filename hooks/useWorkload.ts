@@ -1,6 +1,5 @@
 import { api } from "@/lib/axios";
-import { useFetchTasks } from "./useFetchTasks";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 export type WorkloadData = {
     [username: string]: {
@@ -10,27 +9,19 @@ export type WorkloadData = {
     }
 }
 
+async function fetchWorkload() {
+    const res = await api.get('/dashboard/workload');
+    return res.data;
+}
+
 export function useWorkload() {
-    const [loading, setLoading] = useState(false);
-    const [workload, setWorkload] = useState<WorkloadData>({});
-    const { tasks } = useFetchTasks();
-
-    useEffect(() => {
-        const fetchWorkload = async () => {
-            try {
-                setLoading(true)
-
-                const res = await api.get('/dashboard/workload')
-                setWorkload(res.data.workload);
-            } catch (err) {
-                console.error("Error fetching workload:", err)
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchWorkload();
-    }, [])
-
-
-    return { workload, loading }
+    return useQuery({
+        queryKey: ["workload"],
+        queryFn: fetchWorkload,
+        staleTime: 60_000, // 1 min cache before refetch
+        gcTime: 5 * 60_000, // 5 min in memory
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        retry: 1
+    })
 }

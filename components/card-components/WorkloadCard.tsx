@@ -6,7 +6,8 @@ import { useWorkload, WorkloadData } from '@/hooks/useWorkload';
 
 
 const WorkloadCard = () => {
-    const {workload} = useWorkload();
+    const {data} = useWorkload();
+    const {workload} = data ?? {}
 
     const getTotalTasks = (user: WorkloadData[string]) => {
         return user.dueToday + user.dueThisWeek + user.overdue;
@@ -21,9 +22,9 @@ const WorkloadCard = () => {
     }
     return (
         <>
-            {Object.entries(workload).map(([username, data]) => {
-                const { status, color } = getWorkloadStatus(data);
-                const totalTasks = getTotalTasks(data);
+            {Object.entries(workload).map(([username, dataWorkload]) => {
+                const { status, color } = getWorkloadStatus(dataWorkload);
+                const totalTasks = getTotalTasks(dataWorkload);
 
                 return (
                     <Card key={username} className="hover:shadow-lg transition-shadow">
@@ -47,7 +48,7 @@ const WorkloadCard = () => {
                                         <AlertCircle className="h-4 w-4 text-destructive" />
                                         <span className="text-sm font-medium">Overdue</span>
                                     </div>
-                                    <Badge variant="destructive">{data.overdue}</Badge>
+                                    <Badge variant="destructive">{dataWorkload.overdue}</Badge>
                                 </div>
 
                                 {/* Due Today */}
@@ -56,7 +57,7 @@ const WorkloadCard = () => {
                                         <Calendar className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                                         <span className="text-sm font-medium">Due Today</span>
                                     </div>
-                                    <Badge className="bg-orange-600 hover:bg-orange-700 text-white">{data.dueToday}</Badge>
+                                    <Badge className="bg-orange-600 hover:bg-orange-700 text-white">{dataWorkload.dueToday}</Badge>
                                 </div>
 
                                 {/* Due This Week */}
@@ -65,7 +66,7 @@ const WorkloadCard = () => {
                                         <CalendarClock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                         <span className="text-sm font-medium">Due This Week</span>
                                     </div>
-                                    <Badge className="bg-blue-600 hover:bg-blue-700 text-white">{data.dueThisWeek}</Badge>
+                                    <Badge className="bg-blue-600 hover:bg-blue-700 text-white">{dataWorkload.dueThisWeek}</Badge>
                                 </div>
                             </div>
                         </CardContent>

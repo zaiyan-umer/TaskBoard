@@ -8,7 +8,8 @@ import { useWorkload } from '@/hooks/useWorkload';
 
 
 const WorkloadAllUsers = () => {
-  const {loading, workload} = useWorkload();
+  const {isLoading : loading, data} = useWorkload();
+  const {workload} = data ?? {};
 
   if (loading) {
     return (

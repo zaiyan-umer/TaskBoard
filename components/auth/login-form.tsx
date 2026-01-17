@@ -15,7 +15,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const {login, loading, error} = useLogin();
+  const {mutate: login, isPending: loading} = useLogin();
   
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,8 +86,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
               </FieldDescription>
             </FieldGroup>
           </form>
-          <div className="relative hidden md:block bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20" />
+          <div className="relative hidden md:block bg-linear-to-br from-blue-500 via-purple-500 to-pink-500">
+            <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/10 to-white/20" />
             <div className="absolute inset-0 flex items-center justify-center p-8">
               <div className="text-white text-center space-y-4">
                 <h2 className="text-4xl font-bold drop-shadow-lg">Task Manager</h2>

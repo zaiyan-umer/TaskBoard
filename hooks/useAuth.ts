@@ -4,112 +4,84 @@ import { api } from "@/lib/axios"
 import { validateLoginForm, validateSignupForm } from "@/lib/input-validation"
 import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
 import { toast } from "sonner"
 import { useSetUser } from "@/store/auth.store"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+
+type LoginParams = { email: string; password: string }
+
+const login = async ({ email, password }: LoginParams) => {
+    const res = await api.post("/auth/login", { email, password })
+    return res.data
+}
 
 export function useLogin() {
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string>("")
     const router = useRouter()
     const setUser = useSetUser()
+    const queryClient = useQueryClient()
 
-    const login = async ({ email, password }: { email: string; password: string }) => {
-        setError("")
-
-        const isValid = validateLoginForm(email, password, setError)
-        if (!isValid) return false
-
-        setLoading(true)
-        try {
-            const res = await api.post("/auth/login", { email, password })
-
+    return useMutation({
+        mutationFn: async (params: LoginParams) => {
+            const isValid = validateLoginForm(params.email, params.password)
+            if (!isValid) throw new Error("Validation failed")
+            return login(params)
+        },
+        onSuccess: (data) => {
+            queryClient.clear() // drop cached data from previous session
             toast.success("Login successful!")
-
-            setUser(res.data.user);
-            
-            router.push(res.data.user.role === "admin" ? "/admin-panel" : "/")
-            return true
-        } catch (err) {
+            setUser(data.user)
+            router.push(data.user.role === "admin" ? "/admin-panel" : "/")
+        },
+        onError: (err) => {
             const error = err as AxiosError<{ message: string }>
-            const message =
-                error.response?.data?.message || "Failed to login. Please try again."
-
-            setError(message)
-            setUser(null);
+            const message = error.response?.data?.message || "Failed to login"
             toast.error(message)
-            return false
-        } finally {
-            setLoading(false)
         }
-    }
-
-    return { login, loading, error }
+    })
 }
 
 export function useSignup() {
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string>("")
     const router = useRouter()
 
-    const signup = async ({ email, username, password }: { email: string; username: string; password: string }) => {
-        setError("")
-
-        const isValid = validateSignupForm(email, username, password, setError)
-        if (!isValid) return false
-
-        setLoading(true)
-        try {
-            const res = await api.post("/auth/register", { email, username, password })
-
+    return useMutation({
+        mutationFn: async (params: { email: string; username: string; password: string }) => {
+            const isValid = validateSignupForm(params.email, params.username, params.password)
+            if (!isValid) throw new Error("Validation failed")
+            const res = await api.post("/auth/register", params)
+            return res.data
+        },
+        onSuccess: (data) => {
             toast.success("Registration successful!")
-
-            router.push(res.data.role === "admin" ? "/dashboard" : "/")
-            return true
-        } catch (err) {
+            router.push(data.role === "admin" ? "/dashboard" : "/")
+        },
+        onError: (err) => {
             const error = err as AxiosError<{ message: string }>
-            const message =
-                error.response?.data?.message || "Failed to signup. Please try again."
-
-            setError(message)
+            const message = error.response?.data?.message || "Failed to signup"
             toast.error(message)
-            return false
-        } finally {
-            setLoading(false)
         }
-    }
-
-    return { signup, loading, error }
+    })
 }
 
 export function useLogout() {
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string>("")
     const router = useRouter()
     const setUser = useSetUser()
+    const queryClient = useQueryClient()
 
-    const logout = async () => {
-        setError("")
-
-        setLoading(true)
-
-        try {
-            const res = await api.get("/auth/logout");
-            if (res.status === 200) {
-                toast.success("Logged out successfully!");
-                router.push("/auth/login");
-                setUser(null);
-                return true
-            }
-        } catch (err) {
+    return useMutation({
+        mutationFn: async () => {
+            const res = await api.get("/auth/logout")
+            return res.data
+        },
+        onSuccess: () => {
+            queryClient.clear() // clear all cached queries on logout
+            toast.success("Logged out successfully!")
+            setUser(null)
+            router.push("/auth/login")
+        },
+        onError: (err) => {
             const error = err as AxiosError<{ message: string }>
-            const errorMessage = error.response?.data?.message || "Failed to logout. Please try again.";
-            setError(errorMessage)
-            toast.error(errorMessage);
-        } finally {
-            setLoading(false)
+            const message = error.response?.data?.message || "Failed to logout"
+            toast.error(message)
         }
-    }
-
-    return { logout, loading, error }
+    })
 }

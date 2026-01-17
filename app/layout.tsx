@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner"
 import "./globals.css";
 import { AuthInitializer } from "@/components/auth/AuthInitializer";
 import { AppChrome } from "@/components/auth/AppChrome";
+import QueryProvider from "@/components/QueryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,10 +32,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="min-h-screen p-4 sm:p-6 lg:p-8 pt-16">
-          <AuthInitializer />
-          <AppChrome>
-            {children}
-          </AppChrome>
+          <QueryProvider>
+            <AuthInitializer />
+            <AppChrome>
+              {children}
+            </AppChrome>
+          </QueryProvider>
         </div>
         <Toaster position="top-center" richColors />
       </body>

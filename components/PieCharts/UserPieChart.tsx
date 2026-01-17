@@ -3,15 +3,15 @@ import { RoundedPieChart } from './RoundedPieChart'
 import { ChartConfig } from '../ui/chart'
 import { useStats } from '@/hooks/useStats'
 
+const UserPieChart = () => {
 
-const UserPieChart = ({ tasks }) => {
-
-    const { taskStatuses, taskPriorities } = useStats(tasks, 'my-stats');
+    const { data } = useStats('my-stats');
+    const { Todo = 0, InProgress = 0, Done = 0, HighPriority = 0, LowPriority = 0, MediumPriority = 0 } = data ?? {};
 
     const statusChartData = [
-        { status: 'Todo', count: taskStatuses.Todo, fill: 'var(--chart-todo)' },
-        { status: 'InProgress', count: taskStatuses.InProgress, fill: 'var(--chart-in-progress)' },
-        { status: 'Done', count: taskStatuses.Done, fill: 'var(--chart-done)' },
+        { status: 'Todo', count: Todo, fill: 'var(--chart-todo)' },
+        { status: 'InProgress', count: InProgress, fill: 'var(--chart-in-progress)' },
+        { status: 'Done', count: Done, fill: 'var(--chart-done)' },
     ]
 
     const statusChartConfig = {
@@ -33,9 +33,9 @@ const UserPieChart = ({ tasks }) => {
     } satisfies ChartConfig
 
     const priorityChartData = [
-        { priority: 'HighPriority', count: taskPriorities.HighPriority, fill: 'var(--chart-priority-high)' },
-        { priority: 'MediumPriority', count: taskPriorities.MediumPriority, fill: 'var(--chart-priority-medium)' },
-        { priority: 'LowPriority', count: taskPriorities.LowPriority, fill: 'var(--chart-priority-low)' },
+        { priority: 'HighPriority', count: HighPriority, fill: 'var(--chart-priority-high)' },
+        { priority: 'MediumPriority', count: MediumPriority, fill: 'var(--chart-priority-medium)' },
+        { priority: 'LowPriority', count: LowPriority, fill: 'var(--chart-priority-low)' },
     ]
 
     const priorityChartConfig = {

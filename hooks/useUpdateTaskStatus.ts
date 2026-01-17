@@ -1,34 +1,35 @@
 'use client'
-import { useState } from "react";
 import { toast } from "sonner";
-import { updateTaskStatus } from "@/lib/fetch-data";
 import { AxiosError } from "axios";
 import { TaskStatus } from "../models/task";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/axios";
 
-export function useUpdateTaskStatus(initialStatus: TaskStatus) {
-  const [status, setStatus] = useState(initialStatus);
-  const [loading, setLoading] = useState<true | false>(false);
+type UpdateStatusParams = {
+  taskId: string;
+  newStatus: TaskStatus;
+}
 
-  const updateStatus = async (taskId: string, newStatus: typeof status) => {
-    setStatus(newStatus);
-    setLoading(true);
+const updateStatus = async ({ taskId, newStatus }: UpdateStatusParams) => {
+  const res = await api.patch(`/tasks/${taskId}/status`, { status: newStatus });
+   return res.data;
+}
 
-    try {
-      const res = await updateTaskStatus({ id: taskId, newStatus });
-      if (res.status === 200) {
-        toast.success("Task updated successfully!");
-        window.dispatchEvent(new CustomEvent("task:updated"));
-        return true;
-      }
-    } catch (err) {
-      const error = err as AxiosError<{ message: string }>;
-      toast.error(error.response?.data?.message || "Failed to update task");
-      setStatus(initialStatus);
-      return false;
-    } finally {
-      setLoading(false);
+export function useUpdateTaskStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateStatus,
+    onSuccess: () => {
+      toast.success("Task updated successfully!");
+      // Invalidate and refetch tasks automatically
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+      queryClient.invalidateQueries({ queryKey: ["workload"] });
+    },
+    onError: (error) => {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(axiosError.response?.data?.message || "Failed to update task");
     }
-  };
-
-  return { status, setStatus, updateStatus, loading };
+  })
 }

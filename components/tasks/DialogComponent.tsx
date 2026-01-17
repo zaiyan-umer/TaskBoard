@@ -8,7 +8,7 @@ import { Plus } from "lucide-react"
 
 export default function DialogComponent() {
   const [open, setOpen] = useState(false)
-  const { createTask, loading } = useCreateTask()
+  const { mutate: createTask, isPending: loading } = useCreateTask()
 
   const [formData, setFormData] = useState({
     title: "",
@@ -19,20 +19,21 @@ export default function DialogComponent() {
   })
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const success = await createTask(formData)
-    if (!success) return
-
-    setFormData({
-      title: "",
-      description: "",
-      priority: "medium",
-      dueDate: undefined,
-      assignedTo: ""
-    })
-    setOpen(false)
-  }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  createTask(formData, {
+    onSuccess: () => {
+      setFormData({
+        title: "",
+        description: "",
+        priority: "medium",
+        dueDate: undefined,
+        assignedTo: ""
+      })
+      setOpen(false)
+    }
+  })
+}
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

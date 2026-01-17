@@ -1,7 +1,7 @@
-import React from 'react'
 import CardComponent from './CardComponent';
+import { PopulatedTask } from '@/models/task';
 
-const Cards = ({tasks}) => {
+const Cards = ({tasks}: {tasks?: PopulatedTask[]}) => {
 
     const getPriorityAccentColor = (priority: string) => {
         switch (priority) {
@@ -11,6 +11,11 @@ const Cards = ({tasks}) => {
             default: return { bg: 'bg-gray-50 dark:bg-gray-900/20', border: 'border-gray-200 dark:border-gray-800', icon: 'text-gray-600 dark:text-gray-400', text: 'text-gray-600 dark:text-gray-400', badge: 'bg-gray-100 text-gray-700 border-gray-300' };
         }
     };
+    
+    if (!tasks || tasks.length === 0) {
+        return <div className="text-center text-gray-500">No tasks found</div>;
+    }
+    
     return (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mt-4 col-span-2">
             {tasks.map((task) => {

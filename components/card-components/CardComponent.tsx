@@ -15,13 +15,12 @@ type Color = {
 }
 
 const CardComponent = ({ task, colors }: { task: PopulatedTask, colors: Color }) => {
-    const { deleteTask } = useDeleteTask();
     const user = useUser()
-
-    const { status, updateStatus, loading } = useUpdateTaskStatus(task.status as TaskStatus);
+    const { mutate: deleteTask } = useDeleteTask();
+    const { mutate: updateStatus, isPending } = useUpdateTaskStatus();
 
     const handleDelete = async () => {
-        await deleteTask(task._id?.toString() as string);
+        deleteTask(task._id?.toString() as string);
     }
 
     const handleStatusChange = async (newStatus: TaskStatus) => {
@@ -29,7 +28,7 @@ const CardComponent = ({ task, colors }: { task: PopulatedTask, colors: Color })
             toast.error("Invalid task")
             return
         }
-        await updateStatus(task._id?.toString(), newStatus);
+        updateStatus({ taskId: task._id?.toString(), newStatus });
     };
 
     const formatDate = (date: string | Date | undefined) => {
@@ -47,6 +46,7 @@ const CardComponent = ({ task, colors }: { task: PopulatedTask, colors: Color })
         }
     };
 
+
     return (
         <Card className={`max-h-100 border-2 relative shadow-lg hover:shadow-xl transition-all duration-300 ${getPriorityBorderColor(task.priority)} flex flex-col`}>
             <CardHeader className="space-y-3 sm:space-y-4 pb-4 flex-1">
@@ -58,7 +58,7 @@ const CardComponent = ({ task, colors }: { task: PopulatedTask, colors: Color })
                         <Badge variant="secondary" className={`${colors.badge} font-medium border text-xs sm:text-sm`}>
                             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
                         </Badge>
-                        <Select value={status} onValueChange={handleStatusChange} disabled={loading}>
+                        <Select value={task?.status} onValueChange={handleStatusChange} disabled={isPending}>
                             <SelectTrigger className="w-32 sm:w-40 cursor-pointer">
                                 <SelectValue placeholder="Select status" />
                             </SelectTrigger>

@@ -1,30 +1,25 @@
 'use client'
 import { useUsers } from '@/hooks/useUsers';
 import { useUser } from '@/store/auth.store'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { User, Mail, Shield, Crown, Loader2 } from 'lucide-react'
-import { api } from '@/lib/axios'
-import { toast } from 'sonner'
+import { useUpgradeUser } from '@/hooks/useUpgradeUser';
 
 const Profile = () => {
     const user = useUser();
-    const { users } = useUsers(user?.role);
+    const { data } = useUsers(user?.role);
+    const users = data ?? []
+    const { mutateAsync: upgradeUser } = useUpgradeUser();
     const [upgrading, setUpgrading] = useState<string | null>(null);
 
     const handleUpgradeToAdmin = async (userId: string) => {
+        setUpgrading(userId);
         try {
-            setUpgrading(userId);
-            const res = await api.patch(`/users/${userId}/upgrade`, { role: 'admin' });
-            if (res.status === 200) {
-                toast.success('User upgraded to admin successfully!');
-                window.dispatchEvent(new CustomEvent('user:updated'));
-            }
-        } catch (err) {
-            toast.error('Failed to upgrade user');
+            await upgradeUser(userId);
         } finally {
             setUpgrading(null);
         }

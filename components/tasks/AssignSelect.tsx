@@ -16,8 +16,8 @@ type AssignSelectProps = {
 }
 
 export function AssignSelect({ formData, setFormData, role }: AssignSelectProps) {
-  const { users, loading } = useUsers(role)
-
+  const { data, isPending: loading } = useUsers(role)
+  const users = data ?? []
   if (loading) return <p>Loading users...</p>
 
   return (
