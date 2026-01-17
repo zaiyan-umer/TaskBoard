@@ -22,8 +22,13 @@ A comprehensive full-stack task management application with role-based access co
 - Next.js API Routes, Node.js, MongoDB + Mongoose, bcrypt, JWT
   
 ## 📊 Architecture & Flow
+### Flow
 <img width="3123" height="1470" alt="flowchart" src="https://github.com/user-attachments/assets/a6823306-a5d8-42da-bf80-729901728053" />
+
+### Dashboard
 <img width="1883" height="871" alt="gh-1" src="https://github.com/user-attachments/assets/406def8e-3b8d-4bfc-8763-671592b9ac45" />
+
+### Admin Panel
 <img width="1157" height="435" alt="gh-2" src="https://github.com/user-attachments/assets/fdc4bda4-7185-4b14-a236-8d92d7d1beeb" />
 
 
