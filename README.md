@@ -17,7 +17,7 @@ A comprehensive full-stack task management application with role-based access co
 ## 🛠️ Tech Stack
 
 ### Frontend: 
-- Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui, Zustand, Recharts, Axios, Lucide React, Sonner
+- Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui, Zustand, TanStack Query, Recharts, Axios, Lucide React, Sonner
 ### Backend: 
 - Next.js API Routes, Node.js, MongoDB + Mongoose, bcrypt, JWT
   
@@ -151,7 +151,6 @@ The app uses JWT-based authentication with:
 
 - **Zustand Stores:**
   - `auth.store.ts` - User authentication state
-  - `tasks.store.ts` - Task management state
 
 - **Custom Hooks:**
   - `useAuth()` - Authentication state and methods

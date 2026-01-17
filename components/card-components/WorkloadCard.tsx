@@ -23,8 +23,9 @@ const WorkloadCard = () => {
     return (
         <>
             {Object.entries(workload).map(([username, dataWorkload]) => {
-                const { status, color } = getWorkloadStatus(dataWorkload);
-                const totalTasks = getTotalTasks(dataWorkload);
+                const typedWorkload = dataWorkload as WorkloadData[string];
+                const { status, color } = getWorkloadStatus(typedWorkload);
+                const totalTasks = getTotalTasks(typedWorkload);
 
                 return (
                     <Card key={username} className="hover:shadow-lg transition-shadow">
@@ -48,7 +49,7 @@ const WorkloadCard = () => {
                                         <AlertCircle className="h-4 w-4 text-destructive" />
                                         <span className="text-sm font-medium">Overdue</span>
                                     </div>
-                                    <Badge variant="destructive">{dataWorkload.overdue}</Badge>
+                                    <Badge variant="destructive">{typedWorkload.overdue}</Badge>
                                 </div>
 
                                 {/* Due Today */}
@@ -57,7 +58,7 @@ const WorkloadCard = () => {
                                         <Calendar className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                                         <span className="text-sm font-medium">Due Today</span>
                                     </div>
-                                    <Badge className="bg-orange-600 hover:bg-orange-700 text-white">{dataWorkload.dueToday}</Badge>
+                                    <Badge className="bg-orange-600 hover:bg-orange-700 text-white">{typedWorkload.dueToday}</Badge>
                                 </div>
 
                                 {/* Due This Week */}
@@ -66,7 +67,7 @@ const WorkloadCard = () => {
                                         <CalendarClock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                         <span className="text-sm font-medium">Due This Week</span>
                                     </div>
-                                    <Badge className="bg-blue-600 hover:bg-blue-700 text-white">{dataWorkload.dueThisWeek}</Badge>
+                                    <Badge className="bg-blue-600 hover:bg-blue-700 text-white">{typedWorkload.dueThisWeek}</Badge>
                                 </div>
                             </div>
                         </CardContent>
